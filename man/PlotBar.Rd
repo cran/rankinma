@@ -26,21 +26,21 @@ accumulative styles.
 }
 \examples{
 ## Not run:
-library(netmeta)
-data(Senn2013)
-nma <- netmeta(TE, seTE, treat1, treat2,
-  studlab, data = Senn2013, sm = "SMD")
+#library(netmeta)
+#data(Senn2013)
+#nma <- netmeta(TE, seTE, treat1, treat2,
+#studlab, data = Senn2013, sm = "SMD")
 
 # Get SUCRA
-dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
-  model = "random", simt = 1000)
+#dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
+#model = "random", simt = 1000)
 
 # Set data for rankinma
-dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-  metrics = SUCRA, metrics.name = "SUCRA")
+#dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#metrics = SUCRA, metrics.name = "SUCRA")
 
 # Illustrate bar plot
-PlotBar(dataRankinma)
+#PlotBar(dataRankinma)
 ## End(Not run)
 
 }
@@ -50,9 +50,9 @@ Hillege, H. (2013). ADDIS: a decision support system for evidence-based
 medicine. \strong{Decision Support Systems}, \emph{55(2)}, 459-475.
 }
 \seealso{
-\code{\link{GetMetrics}} \code{\link{SetMetrics}}
-\code{\link{PlotBeads}} \code{\link{PlotLine}}
-\code{\link{PlotHeat}}
+\code{\link{GetMetrics}}, \code{\link{SetMetrics}},
+\code{\link{PlotBeads}}, \code{\link{PlotLine}},
+\code{\link{PlotHeat}}, \code{\link{PlotSpie}}
 }
 \author{
 Enoch Kang

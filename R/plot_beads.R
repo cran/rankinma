@@ -11,30 +11,30 @@
 #' @return
 #' **PlotBeads()** returns a beading plot.
 #'
-#' @seealso \code{\link{GetMetrics}} \code{\link{SetMetrics}}
+#' @seealso \code{\link{GetMetrics}}, \code{\link{SetMetrics}}
 #'
 #' @examples
 #' ## Not run:
-#' library(netmeta)
-#' data(Senn2013)
-#' nma <- netmeta(TE, seTE, treat1, treat2,
-#'   studlab, data = Senn2013, sm = "SMD")
+#' #library(netmeta)
+#' #data(Senn2013)
+#' #nma <- netmeta(TE, seTE, treat1, treat2,
+#' #studlab, data = Senn2013, sm = "SMD")
 #'
 #' # Get SUCRA
-#' nma.1 <- GetMetrics(nma, outcome = "HbA1c.random", prefer = "small", metrics = "SUCRA",
-#'   model = "random", simt = 1000)
-#' nma.2 <- GetMetrics(nma, outcome = "HbA1c.common", prefer = "small", metrics = "SUCRA",
-#'   model = "common", simt = 1000)
+#' #nma.1 <- GetMetrics(nma, outcome = "HbA1c.random", prefer = "small", metrics = "SUCRA",
+#' #model = "random", simt = 1000)
+#' #nma.2 <- GetMetrics(nma, outcome = "HbA1c.common", prefer = "small", metrics = "SUCRA",
+#' #model = "common", simt = 1000)
 #'
 #' # Combine metrics of multiple outcomes
-#' dataMetrics <- rbind(nma.1, nma.2)
+#' #dataMetrics <- rbind(nma.1, nma.2)
 #'
 #' # Set data for rankinma
-#' dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-#'   metrics = SUCRA, metrics.name = "SUCRA")
+#' #dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#' #metrics = SUCRA, metrics.name = "SUCRA")
 #'
 #' # Illustrate beading plot
-#' PlotBeads(data = dataRankinma)
+#' #PlotBeads(data = dataRankinma)
 #' ## End(Not run)
 #'
 #' @export PlotBeads
@@ -48,9 +48,10 @@ PlotBeads <- function(data,
   lgcMtrcs  <- ifelse(data$metrics.name == "Probabilities",
                       TRUE,
                       FALSE)
-  lgcColor  <- ifelse(is.null(color), FALSE,
-                      length(color) != data$n.tx)
-  argColor  <- deparse(substitute(color))
+
+  lgcColor  <- ifelse(length(which(ls()%in%ls(pattern = "color"))) > 0, FALSE,
+                      ifelse(length(color) != data$n.tx,
+                             TRUE, FALSE))
 
   if (lgcInher) {
     cat(paste(" Inherit -------------------------------------------------- X\n",
@@ -88,10 +89,24 @@ PlotBeads <- function(data,
   dataBeads$seq.outcome <- max(dataBeads$outcomes) + 1 - dataBeads$outcomes
   dataBeads$seq.tx      <- max(dataBeads$txs) + 1 - dataBeads$txs
 
+  dataBeads$seq.axis.y  <- dataBeads$seq.outcome
+  dataBeads             <- dataBeads[order(-dataBeads$seq.axis.y), ]
+
   txs      <- unique(dataBeads$tx)
   outcomes <- unique(dataBeads$outcome)
 
   dataBeadsPlot <- dataBeads
+
+  colorTx <- data$color.txs
+
+  if (!is.null(color)) {
+    if (length(which(ls()%in%ls(pattern = "color"))) > 0) {
+      colorTx$colorTx <- color
+      for (color.i in c(1:nrow(dataBeadsPlot))) {
+        dataBeadsPlot[color.i, "colorTx"] <- colorTx[which(dataBeadsPlot[color.i, "tx"] == colorTx$lsTx), "colorTx"]
+      }
+    }
+  }
 
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
@@ -99,7 +114,7 @@ PlotBeads <- function(data,
   par(mar = c(5, 5, 3, 5), xpd = TRUE)
 
   plot(dataBeadsPlot$metrics,
-       dataBeadsPlot$importance - 0.5, frame.plot = FALSE,
+       dataBeadsPlot$seq.axis.y - 0.5, frame.plot = FALSE,
        xlim = c(-0.3, 1.3),
        ylim = c(0, ceiling(max(dataBeadsPlot$importance, na.rm = TRUE))),
        xlab = "", xaxt = "n", yaxt = "n",ylab="",
@@ -114,34 +129,22 @@ PlotBeads <- function(data,
                       "   ---> Better", sep = ""),
        font = 1, cex.axis = 1)
   text(rep(-0.3, data$n.outcome),
-       c(1:data$n.outcome) - 0.5,
+       unique(dataBeadsPlot$seq.outcome) - 0.5,
        c(unique(dataBeadsPlot$outcome)), pos = 4, cex = 1)
   segments(0, c(dataBeadsPlot$outcomes) - 0.5,
            1, c(dataBeadsPlot$outcomes) - 0.5, col = "gray",
            lty = c(rep(1, data$n.outcome)))
 
-
-  if (is.null(color)) {
-    points(dataBeadsPlot$metrics,
-           dataBeadsPlot$importance - 0.5,
-           pch = dataBeadsPlot$shape,
-           col = c(dataBeadsPlot$color.tx),
-           bg = c(dataBeadsPlot$color.tx), cex = 2)
-    points(c(rep(1.1, data$n.tx)),
-           (data$n.outcome - 0.5) / data$n.tx * c(1:data$n.tx),
-           pch = dataBeadsPlot$shape,
-           col = c(dataBeadsPlot$color.tx),
-           bg = c(dataBeadsPlot$color.tx))
-  } else {
-    points(dataBeadsPlot$metrics,
-           dataBeadsPlot$importance - 0.5,
-           pch = dataBeadsPlot$shape,
-           col = color, bg = color, cex = 2)
-    points(c(rep(1.1, data$n.tx)),
-           (data$n.outcome - 0.5) / data$n.tx * c(1:data$n.tx),
-           pch = dataBeadsPlot$shape,
-           col = color, bg = color)
-  }
+  points(dataBeadsPlot$metrics,
+         dataBeadsPlot$seq.axis.y - 0.5,
+         pch = dataBeadsPlot$shape,
+         col = c(dataBeadsPlot$colorTx),
+         bg = c(dataBeadsPlot$colorTx), cex = 2)
+  points(c(rep(1.1, data$n.tx)),
+         (data$n.outcome - 0.5) / data$n.tx * c(1:data$n.tx),
+         pch = dataBeadsPlot$shape,
+         col = c(unique(dataBeadsPlot$colorTx)),
+         bg = c(unique(dataBeadsPlot$colorTx)))
 
   text(c(rep(1.15, data$n.tx)),
        (data$n.outcome - 0.5) / data$n.tx * c(1:data$n.tx),

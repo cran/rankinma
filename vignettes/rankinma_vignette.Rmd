@@ -1,7 +1,7 @@
 ---
 title: "rankinma_vignette"
 author: "Enoch Kang, Chiehfeng Chen Wen-Hsuan Hou, Jin-Hua Chen, Yu-Chieh Chuang, & Edwin Chan"
-date: "April 4, 2023"
+date: "April 9, 2023"
 description: > 
   Treatment ranking in network meta-analysis.
 output: 
@@ -55,6 +55,8 @@ Briefly, *rankinma* can be used for visualization of both detailed metrics of pr
 - **Beading plot:** a novel graphics for displaying global metrics of treatment ranking (i.e. SUCRA and P-score) based on numeric line plot.
 - **Bar chart:** a classic graphics for most metrics of treatment ranking (i.e. probabilities, SUCRA, and P-score), and *rankinma* supports two sub-type of bar chart in terms of side-by-side bar chart and cumulative bar chart.
 - **Line chart:** a classic graphics for most metrics of treatment ranking (i.e. probabilities, SUCRA, and P-score), and *rankinma* supports two sub-type of line chart in terms of simple line chart (a line on a chart) and composite line chart (multiple lines on a chart).
+- **Heat plot:** a new graphics for showing global metrics of treatment ranking (i.e. SUCRA and P-score) for each outcome, and *rankinma* supports to gather all heat plots of outcomes with interests on a plot.
+- **Spie chart:** a new graphics proposed in 2020 for displaying multiple global metrics of treatment ranking (i.e. SUCRA and P-score) from outcomes with interests by each treatment, and *rankinma* supports to place all spie charts on a plot.
 
 
 ## Flow and functions

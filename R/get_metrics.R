@@ -39,18 +39,18 @@
 #'
 #' @examples
 #' ## Not run:
-#' library(netmeta)
-#' data(Senn2013)
-#' nma <- netmeta(TE, seTE, treat1, treat2,
-#'   studlab, data = Senn2013, sm = "SMD")
+#' #library(netmeta)
+#' #data(Senn2013)
+#' #nma <- netmeta(TE, seTE, treat1, treat2,
+#' #studlab, data = Senn2013, sm = "SMD")
 #'
 #' # Get SUCRA
-#' dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small",
-#'   metrics = "SUCRA", model = "random", simt = 1000)
+#' #dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small",
+#' #metrics = "SUCRA", model = "random", simt = 1000)
 #'
 #' # Get P-score
-#' dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small",
-#'   metrics = "P-score", model = "random", simt = 1000)
+#' #dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small",
+#' #metrics = "P-score", model = "random", simt = 1000)
 #' ## End(Not run)
 #'
 #' @export GetMetrics
@@ -211,8 +211,8 @@ GetMetrics <- function(data,
     dataGet$tx   <- colnames(dataGet)
     dataGet$rank <- rownames(dataGet)
     dataGet      <- dataGet[, c(length(dataGet)-1,
-                                        length(dataGet),
-                                        2:length(dataGet)-2)]
+                                length(dataGet),
+                                2:length(dataGet)-2)]
   } else if (argMetrics == "ALL") {
     colnames(dataGet) <- c("P-best", "SUCRA", "P-score")
     dataGet$tx        <- rownames(dataGet)

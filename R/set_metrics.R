@@ -23,23 +23,23 @@
 #'
 #' @examples
 #' ## Not run:
-#' library(netmeta)
-#' data(Senn2013)
-#' nma <- netmeta(TE, seTE, treat1, treat2,
-#'   studlab, data = Senn2013, sm = "SMD")
+#' #library(netmeta)
+#' #data(Senn2013)
+#' #nma <- netmeta(TE, seTE, treat1, treat2,
+#' #studlab, data = Senn2013, sm = "SMD")
 #'
 #' # Get SUCRA
-#' nma.1 <- GetMetrics(nma, outcome = "HbA1c.random", prefer = "small", metrics = "SUCRA",
-#'   model = "random", simt = 1000)
-#' nma.2 <- GetMetrics(nma, outcome = "HbA1c.common", prefer = "small", metrics = "SUCRA",
-#'   model = "common", simt = 1000)
+#' #nma.1 <- GetMetrics(nma, outcome = "HbA1c.random", prefer = "small", metrics = "SUCRA",
+#' #model = "random", simt = 1000)
+#' #nma.2 <- GetMetrics(nma, outcome = "HbA1c.common", prefer = "small", metrics = "SUCRA",
+#' #model = "common", simt = 1000)
 #'
 #' # Combine metrics of multiple outcomes
-#' dataMetrics <- rbind(nma.1, nma.2)
+#' #dataMetrics <- rbind(nma.1, nma.2)
 #'
 #' # Set data for rankinma
-#' dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-#'   metrics = SUCRA, metrics.name = "SUCRA")
+#' #dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#' #metrics = SUCRA, metrics.name = "SUCRA")
 #' ## End(Not run)
 #'
 #' @export SetMetrics
@@ -170,54 +170,24 @@ SetMetrics <- function(data,
 
   data$importance <- max(data$outcomes) + 1 - data$outcomes
 
-  data$color.r <- 0.2
-  data$color.g <- 0.2
-  data$color.b <- 0.2
+  colorTx <- data.frame(lsTx   = unique(data$tx),
+                        seqTx  = c(1:length(unique(data$tx))),
+                        colorTx = rainbow(length(unique(data$tx)))
+  )
 
-  for (i in seq(1, nrow(data))){
-    j <- c(1, 4:5); k <- c(6, 9:10); l <- c(11, 14:15); m <- c(16, 19:20); n <- c(21, 24:25)
-    data[i, "color.r"] <-ifelse(data[i, "txs"] %in% c(j, j + 25, j + 50, j + 75), 1,
-                                   ifelse(data[i, "txs"] %in% c(k, k + 25, k + 50, k + 75), 0.80,
-                                          ifelse(data[i, "txs"] %in% c(l, l + 25, l + 50, l + 75), 0.50,
-                                                 ifelse(data[i, "txs"] %in% c(m, m + 25, m + 50, m + 75), 0.65,
-                                                        ifelse(data[i, "txs"] %in% c(n, n + 25, n + 50, n + 75), 0.55,
-                                                               data[i, "color.r"])))))
+  data$colorTx <- NA
+
+  for (color.i in c(1:nrow(data))) {
+    data[color.i, "colorTx"] <- colorTx[which(data[color.i, "tx"] == colorTx$lsTx), "colorTx"]
   }
-
-  for (i in seq(1, nrow(data))){
-    j<- c(2,4);k<- c(7,9);l<- c(12,14);m<- c(17,19);n<- c(22,24)
-    data[i, "color.g"] <-ifelse(data[i, "txs"] %in% c(j, j + 25, j + 50, j + 75), 1,
-                                   ifelse(data[i, "txs"] %in% c(k, k + 25, k + 50, k + 75), 0.65,
-                                          ifelse(data[i, "txs"] %in% c(l, l + 25, l + 50, l + 75), 0.80,
-                                                 ifelse(data[i, "txs"] %in% c(m, m + 25, m + 50, m + 75), 0.45,
-                                                        ifelse(data[i, "txs"] %in% c(n, n + 25, n + 50, n + 75), 0.55,
-                                                               data[i, "color.g"])))))
-  }
-
-  for (i in seq(1, nrow(data))){
-    j <- c(3, 5); k <- c(8, 10); l <- c(13, 15); m <- c(18, 20); n <- c(23, 25)
-    data[i, "color.b"] <-ifelse(data[i, "txs"] %in% c(j, j + 25, j + 50, j + 75), 1,
-                                   ifelse(data[i, "txs"] %in% c(k, k + 25, k + 50, k + 75), 0.50,
-                                          ifelse(data[i, "txs"] %in% c(l, l + 25, l + 50, l + 75), 0.80,
-                                                 ifelse(data[i, "txs"] %in% c(m, m + 25, m + 50, m + 75), 0.40,
-                                                        ifelse(data[i, "txs"] %in% c(n, n + 25, n + 50, n + 75), 0.55,
-                                                               data[i, "color.b"])))))
-  }
-
-  sink(tempfile())
-  data$color.tx <- print(rgb(data$color.r,
-                             data$color.g,
-                             data$color.b, 0.8))
-  sink()
-
 
   if (metrics.name == "Probabilities") {
     dataSet <- as.data.frame(cbind(
-      data[, c("outcome", "outcomes", "tx", "txs", "rank", "color.tx")],
+      data[, c("outcome", "outcomes", "tx", "txs", "rank", "colorTx")],
       data[, c(3:(length(unique(data$tx))+2))]))
   } else {
 
-    dataSet <- data[, c("outcome", "outcomes", "importance", "tx", "txs", "color.tx", "metrics")]
+    dataSet <- data[, c("outcome", "outcomes", "importance", "tx", "txs", "colorTx", "metrics")]
 
     for (outcome.i in c(1:max(dataSet$outcomes))) {
       dataTempA <- dataSet[dataSet$outcomes == outcome.i, ]
@@ -238,35 +208,19 @@ SetMetrics <- function(data,
       }
     }
     dataSet <- dataTempB
-
   }
+
+  dataSet <- dataSet[order(dataSet$outcomes), ]
 
   dataList        <- list(metrics.name = metrics.name,
                           ls.outcome   = unique(data$outcome),
                           ls.tx        = unique(data$tx),
                           n.outcome    = length(unique(data$outcome)),
                           n.tx         = length(unique(data$tx)))
-  class(dataList) <- "rankinma"
-  dataList$data   <- dataSet
-
-  #for (outcome.i in c(1:length(unique(data$outcome)))) {
-  #  dataTempA <- dataSet[dataSet$outcomes == outcome.i, ]
-  #  dataTempB <- list(dataTempA)
-  #  nameTemp  <- paste("otcm.",
-  #                     unique(dataTempA$outcome),
-  #                     sep = "")
-  #  assign(nameTemp, dataTempB)
-  #}
-
-  #data.sets <- get(ls(pattern = "otcm.")[1])
-  #for (outcome.i in c(2:length(ls(pattern = "otcm.")))) {
-  #  data.sets <- append(data.sets, get(ls(pattern = "otcm.")[outcome.i]))
-  #}
-
-  #nameLs             <- c(ls(pattern = "otcm."))
-  #names(data.sets)   <- nameLs
-  #dataList$data.sets <- data.sets
-
+  class(dataList)    <- "rankinma"
+  dataList$data      <- dataSet
+  dataList$data.sets <- split(dataSet, dataSet$outcome)
+  dataList$color.txs <- colorTx
   dataRankinma       <- dataList
 
 
@@ -322,7 +276,7 @@ ShowColor <- function(data) {
            rep(0.7, max(data$txs)),
            (0.95) / max(data$txs) * unique(data$txs),
            lwd = 6,
-           col = data$color.tx)
+           col = data$colorTx)
   text(rep(0.8, max(data$txs)),
        (0.95) / max(data$txs) * unique(data$txs),
        data$tx, pos = 4)

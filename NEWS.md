@@ -1,5 +1,17 @@
 # Change of package `rankinma`
 
+## rankinma 0.1.6
+Date: April. 9, 2023
+
+**New function:** `PlotSpie()` is planned to be added for illustrate spie plot of global metrics of treatment ranking (i.e. SUCRA and P-score) using object of class *rankinma* set by function `SetMetrics()`.
+\
+
+**Modify function:** improve data setting and color in both functions of `SetMetrics()` and `PlotBeads`.
+\
+
+**Update to CRAN**  
+\
+
 ## rankinma 0.1.5
 Date: April. 4, 2023
 

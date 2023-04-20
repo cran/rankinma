@@ -21,27 +21,27 @@
 #' Salanti, G. (2013). Graphical tools for network meta-analysis in STATA.
 #' **PloS one**, *8(10)*, e76654.
 #'
-#' @seealso \code{\link{GetMetrics}} \code{\link{SetMetrics}}
-#'          \code{\link{PlotBeads}} \code{\link{PlotBar}}
-#'          \code{\link{PlotHeat}}
+#' @seealso \code{\link{GetMetrics}}, \code{\link{SetMetrics}},
+#'          \code{\link{PlotBeads}}, \code{\link{PlotBar}},
+#'          \code{\link{PlotHeat}}, \code{\link{PlotSpie}}
 #'
 #' @examples
 #' ## Not run:
-#' library(netmeta)
-#' data(Senn2013)
-#' nma <- netmeta(TE, seTE, treat1, treat2,
-#'   studlab, data = Senn2013, sm = "SMD")
+#' #library(netmeta)
+#' #data(Senn2013)
+#' #nma <- netmeta(TE, seTE, treat1, treat2,
+#' #studlab, data = Senn2013, sm = "SMD")
 #'
 #' # Get SUCRA
-#' dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
-#'   model = "random", simt = 1000)
+#' #dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
+#' #model = "random", simt = 1000)
 #'
 #' # Set data for rankinma
-#' dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-#'   metrics = SUCRA, metrics.name = "SUCRA")
+#' #dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#' #metrics = SUCRA, metrics.name = "SUCRA")
 #'
 #' # Illustrate bar plot
-#' PlotLine(dataRankinma)
+#' #PlotLine(dataRankinma)
 #' ## End(Not run)
 #'
 #' @export PlotLine
@@ -105,11 +105,11 @@ PlotLine <- function(data,
                                     TRUE)))
 
   lgcColor  <- ifelse(is.null(color), FALSE,
-                     ifelse(data$metrics.name == "Probabilities",
-                            ifelse(argCompo == TRUE,
-                                   ifelse(length(color) != data$n.tx, TRUE, FALSE),
-                                   ifelse(length(color) != 1, TRUE, FALSE)),
-                            ifelse(length(color) != 1, TRUE, FALSE)))
+                      ifelse(data$metrics.name == "Probabilities",
+                             ifelse(argCompo == TRUE,
+                                    ifelse(length(color) != data$n.tx, TRUE, FALSE),
+                                    ifelse(length(color) != 1, TRUE, FALSE)),
+                             ifelse(length(color) != 1, TRUE, FALSE)))
 
   cat("Check arguments:\n")
 
@@ -179,8 +179,8 @@ PlotLine <- function(data,
         fill = TRUE, sep = "")
   }
 
-    if (lgcInher | lgcColor)
-      stop("Correct above mentioned problem(s).")
+  if (lgcInher | lgcColor)
+    stop("Correct above mentioned problem(s).")
 
   txs      <- unique(dataLine$tx)
   outcomes <- unique(dataLine$outcome)
@@ -198,7 +198,7 @@ PlotLine <- function(data,
       par(mar = c(5, 5, 5, 7), xpd = TRUE)
       for (outcome.i in c(1:length(outcomes))) {
         dataLinePlot <- dataLine[dataLine$outcomes == outcome.i, ]
-      plot(dataLinePlot[, c(7)],
+        plot(dataLinePlot[, c(7)],
              type = "line",
              cex.names = 0.8,
              cex.axis = 0.8,
@@ -206,10 +206,10 @@ PlotLine <- function(data,
              ylim = c(0, 1),
              yaxt = "n", ylab = "Probability", xlab = "Rank",
              col = if (is.null(argColor)) {
-               c(dataLinePlot$color.tx[1])
+               c(dataLinePlot$colorTx[1])
              } else {
                argColor[1]
-               },
+             },
              legend = FALSE, frame.plot = FALSE)
         axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
         title(paste("Composite line chart of rank probability on ",
@@ -220,10 +220,10 @@ PlotLine <- function(data,
           lines(dataLinePlot[, c(5)],
                 dataLinePlot[, c(tx.i)],
                 col = if (is.null(argColor)) {
-                  c(dataLinePlot$color.tx[tx.i-6])
+                  c(dataLinePlot$colorTx[tx.i-6])
                 } else {
                   argColor[tx.i-6]
-                  }
+                }
           )
         }
 
@@ -233,7 +233,7 @@ PlotLine <- function(data,
                  (0.95) / nrow(dataLinePlot) * dataLinePlot$txs,
                  lwd = 2,
                  col = if (is.null(argColor)) {
-                   c(dataLinePlot$color.tx)
+                   c(dataLinePlot$colorTx)
                  } else {
                    argColor}
         )

@@ -1,7 +1,7 @@
 Package: rankinma
 Type: Package
 Title: Treatment Ranking in Network Meta-Analysis
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: c(person("Cheihfeng", "Chen", role = c("aut"), 
                   comment = c(ORCID = "0000-0002-1595-6553"), 
                   email = "clifchen@tmu.edu.tw"),
@@ -28,7 +28,7 @@ VignetteBuilder: knitr
 RoxygenNote: 7.2.2
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-04-04 02:07:29 UTC; KYN
+Packaged: 2023-04-20 23:25:45 UTC; KYN
 Author: Cheihfeng Chen [aut] (<https://orcid.org/0000-0002-1595-6553>),
   Enoch Kang [aut, cre, trl] (<https://orcid.org/0000-0002-4903-942X>),
   Wen-Hsuan Hou [aut] (<https://orcid.org/0000-0002-4376-6298>),
@@ -36,4 +36,4 @@ Author: Cheihfeng Chen [aut] (<https://orcid.org/0000-0002-1595-6553>),
   Yu-Chieh Chuang [aut] (<https://orcid.org/0000-0002-7124-6556>),
   Edwin Chan [aut]
 Repository: CRAN
-Date/Publication: 2023-04-04 19:50:03 UTC
+Date/Publication: 2023-04-20 23:42:34 UTC

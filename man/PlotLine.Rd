@@ -26,21 +26,21 @@ and composite styles.
 }
 \examples{
 ## Not run:
-library(netmeta)
-data(Senn2013)
-nma <- netmeta(TE, seTE, treat1, treat2,
-  studlab, data = Senn2013, sm = "SMD")
+#library(netmeta)
+#data(Senn2013)
+#nma <- netmeta(TE, seTE, treat1, treat2,
+#studlab, data = Senn2013, sm = "SMD")
 
 # Get SUCRA
-dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
-  model = "random", simt = 1000)
+#dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
+#model = "random", simt = 1000)
 
 # Set data for rankinma
-dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-  metrics = SUCRA, metrics.name = "SUCRA")
+#dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#metrics = SUCRA, metrics.name = "SUCRA")
 
 # Illustrate bar plot
-PlotLine(dataRankinma)
+#PlotLine(dataRankinma)
 ## End(Not run)
 
 }
@@ -50,9 +50,9 @@ Salanti, G. (2013). Graphical tools for network meta-analysis in STATA.
 \strong{PloS one}, \emph{8(10)}, e76654.
 }
 \seealso{
-\code{\link{GetMetrics}} \code{\link{SetMetrics}}
-\code{\link{PlotBeads}} \code{\link{PlotBar}}
-\code{\link{PlotHeat}}
+\code{\link{GetMetrics}}, \code{\link{SetMetrics}},
+\code{\link{PlotBeads}}, \code{\link{PlotBar}},
+\code{\link{PlotHeat}}, \code{\link{PlotSpie}}
 }
 \author{
 Enoch Kang

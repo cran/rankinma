@@ -21,27 +21,27 @@
 #' Hillege, H. (2013). ADDIS: a decision support system for evidence-based
 #' medicine. **Decision Support Systems**, *55(2)*, 459-475.
 #'
-#' @seealso \code{\link{GetMetrics}} \code{\link{SetMetrics}}
-#'          \code{\link{PlotBeads}} \code{\link{PlotLine}}
-#'          \code{\link{PlotHeat}}
+#' @seealso \code{\link{GetMetrics}}, \code{\link{SetMetrics}},
+#'          \code{\link{PlotBeads}}, \code{\link{PlotLine}},
+#'          \code{\link{PlotHeat}}, \code{\link{PlotSpie}}
 #'
 #' @examples
 #' ## Not run:
-#' library(netmeta)
-#' data(Senn2013)
-#' nma <- netmeta(TE, seTE, treat1, treat2,
-#'   studlab, data = Senn2013, sm = "SMD")
+#' #library(netmeta)
+#' #data(Senn2013)
+#' #nma <- netmeta(TE, seTE, treat1, treat2,
+#' #studlab, data = Senn2013, sm = "SMD")
 #'
 #' # Get SUCRA
-#' dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
-#'   model = "random", simt = 1000)
+#' #dataMetrics <- GetMetrics(nma, outcome = "HbA1c", prefer = "small", metrics = "SUCRA",
+#' #model = "random", simt = 1000)
 #'
 #' # Set data for rankinma
-#' dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-#'   metrics = SUCRA, metrics.name = "SUCRA")
+#' #dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#' #metrics = SUCRA, metrics.name = "SUCRA")
 #'
 #' # Illustrate bar plot
-#' PlotBar(dataRankinma)
+#' #PlotBar(dataRankinma)
 #' ## End(Not run)
 #'
 #' @export PlotBar
@@ -65,31 +65,31 @@ PlotBar <- function(data,
                              ifelse(merge == TRUE, TRUE,
                                     "ERROR")))
 
-    if (data$metrics.name == "Probabilities") {
-      if (argAccum == TRUE) {
-        if (isFALSE(is.null(color))) {
-          if (length(color) == data$n.tx) {
-            argColor <- color
-          } else {
-            argColor <- NULL
-          }
+  if (data$metrics.name == "Probabilities") {
+    if (argAccum == TRUE) {
+      if (isFALSE(is.null(color))) {
+        if (length(color) == data$n.tx) {
+          argColor <- color
         } else {
           argColor <- NULL
         }
-      } else if (length(color) == 1) {
-        argColor <- color
       } else {
         argColor <- NULL
       }
-    } else if (isFALSE(is.null(color))) {
-      if (length(color) == 1) {
-        argColor <- color
-      } else {
-        argColor <- NULL
-      }
+    } else if (length(color) == 1) {
+      argColor <- color
     } else {
       argColor <- NULL
     }
+  } else if (isFALSE(is.null(color))) {
+    if (length(color) == 1) {
+      argColor <- color
+    } else {
+      argColor <- NULL
+    }
+  } else {
+    argColor <- NULL
+  }
 
   lgcInher <- !inherits(data, "rankinma")
 
@@ -179,14 +179,14 @@ PlotBar <- function(data,
               names.arg = dataBarPlot$tx,
               yaxt = "n", ylab = "Probability", xlab = "Treatment",
               col = if (is.null(argColor)) {
-                c(dataBarPlot$color.tx)
+                c(dataBarPlot$colorTx)
               } else {
                 argColor
               },
               width = ifelse(argAccum == TRUE,
                              0.8,
                              (1/length(unique(dataBarPlot$tx)))
-                             ),
+              ),
               beside = ifelse(argAccum == TRUE, FALSE, TRUE),
               border = FALSE, legend = FALSE, frame = FALSE)
       axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
@@ -200,7 +200,7 @@ PlotBar <- function(data,
                (0.95) / nrow(dataBarPlot) * dataBarPlot$txs,
                lwd = 10,
                col = if (is.null(argColor)) {
-                 c(dataBarPlot$color.tx)
+                 c(dataBarPlot$colorTx)
                } else {
                  argColor}
       )
@@ -251,7 +251,7 @@ PlotBar <- function(data,
               ylim = c(0, 1),
               names.arg = dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"],
               yaxt = "n",
-              col = c(rgb(dataBar$color.r, dataBar$color.g, dataBar$color.b, 0.8)),
+              col = c(dataBar$colorTx),
               width = 1/length(unique(dataBar$tx)),
               legend = FALSE, beside = FALSE, border = FALSE)
       axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)

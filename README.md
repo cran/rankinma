@@ -59,7 +59,15 @@ of five types of plots with six sub-types.
     supports two sub-type of line chart in terms of simple line chart (a
     line on a chart) and composite line chart (multiple lines on a
     chart).
-
+-   **Heat plot:** a new graphics for showing global metrics of
+    treatment ranking (i.e. SUCRA and P-score) for each outcome, and
+    *rankinma* supports to gather all heat plots of outcomes with
+    interests on a plot.
+-   **Spie chart:** a new graphics proposed in 2020 for displaying
+    multiple global metrics of treatment ranking (i.e. SUCRA and
+    P-score) from outcomes with interests by each treatment, and
+    *rankinma* supports to place all spie charts on a plot.
+    
 ## Flow and functions
 
 Users can visualize treatment ranking after network meta-analysis in
@@ -351,5 +359,4 @@ metrics yet.
 Task force will keep update package *rankinma* for following issues:
 
 -   Scatter plot
--   Spie plot
 -   User-designed color gradient for heat plot.

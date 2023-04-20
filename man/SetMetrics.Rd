@@ -36,23 +36,23 @@ for further ploting in \emph{rankinma}.
 }
 \examples{
 ## Not run:
-library(netmeta)
-data(Senn2013)
-nma <- netmeta(TE, seTE, treat1, treat2,
-  studlab, data = Senn2013, sm = "SMD")
+#library(netmeta)
+#data(Senn2013)
+#nma <- netmeta(TE, seTE, treat1, treat2,
+#studlab, data = Senn2013, sm = "SMD")
 
 # Get SUCRA
-nma.1 <- GetMetrics(nma, outcome = "HbA1c.random", prefer = "small", metrics = "SUCRA",
-  model = "random", simt = 1000)
-nma.2 <- GetMetrics(nma, outcome = "HbA1c.common", prefer = "small", metrics = "SUCRA",
-  model = "common", simt = 1000)
+#nma.1 <- GetMetrics(nma, outcome = "HbA1c.random", prefer = "small", metrics = "SUCRA",
+#model = "random", simt = 1000)
+#nma.2 <- GetMetrics(nma, outcome = "HbA1c.common", prefer = "small", metrics = "SUCRA",
+#model = "common", simt = 1000)
 
 # Combine metrics of multiple outcomes
-dataMetrics <- rbind(nma.1, nma.2)
+#dataMetrics <- rbind(nma.1, nma.2)
 
 # Set data for rankinma
-dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
-  metrics = SUCRA, metrics.name = "SUCRA")
+#dataRankinma <- SetMetrics(dataMetrics, tx = tx, outcome = outcome,
+#metrics = SUCRA, metrics.name = "SUCRA")
 ## End(Not run)
 
 }
