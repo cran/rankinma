@@ -1,19 +1,40 @@
 # Change of package `rankinma`
 
+## rankinma 0.1.7
+### Date: April. 23, 2023
+
+**Update to CRAN**  
+\
+
+### Date: April. 22, 2023
+
+**Modify function:** add transparency in both functions of `SetMetrics()` and `PlotBeads()`.
+\
+
+**Modify function:** revise function `ShowColor()` based on the modification of function `SetMetrics()` on April 20, 2023.
+\
+
+**Modify function:** improve function `PlotBar()`, `PlotLine()`, and `PlotSpie()` to show user-defined colors appropriately.
+\
+
+**Modify function:** improve function `PlotHeat()` to show heat plot with order of metrics or treatment appropriately.
+\
+
+
 ## rankinma 0.1.6
-Date: April. 9, 2023
+### Date: April. 20, 2023
 
 **New function:** `PlotSpie()` is planned to be added for illustrate spie plot of global metrics of treatment ranking (i.e. SUCRA and P-score) using object of class *rankinma* set by function `SetMetrics()`.
 \
 
-**Modify function:** improve data setting and color in both functions of `SetMetrics()` and `PlotBeads`.
+**Modify function:** improve data setting and color in both functions of `SetMetrics()` and `PlotBeads()`.
 \
 
 **Update to CRAN**  
 \
 
 ## rankinma 0.1.5
-Date: April. 4, 2023
+### Date: April. 4, 2023
 
 **Modify function:** keep user's options of par (*'par(no.readonly)'*) after illustrating plots with *rankinma* by using function `on.exit()`.
 \
@@ -21,13 +42,13 @@ Date: April. 4, 2023
 **Re-submit to CRAN**  
 \
 
-Date: April. 1, 2023
+### Date: April. 1, 2023
 
 **New function:** `PlotHeat()` is planned to be added for illustrate heat plot of global metrics of treatment ranking (i.e. SUCRA and P-score) using object of class *rankinma* set by function `SetMetrics()`.
 \
 
 ## rankinma 0.1.4
-Date: March. 27, 2023
+### Date: March. 27, 2023
 
 **Modify function:** remove global assignment (*'<<-'*) from package.
 \
@@ -35,40 +56,40 @@ Date: March. 27, 2023
 **Submit to CRAN**  
 \
 
-Date: Feb. 19, 2023
+### Date: Feb. 19, 2023
 
 **Push to github**  
 \
 
-Date: Feb. 10, 2023
+### Date: Feb. 10, 2023
 
 **Modify function:** all functions were modified due to warnings regarding *... invisible binding for '<<-' assignment ...* .
 \
 
 ## rankinma 0.1.3
 
-Date: Feb. 06, 2023
+### Date: Feb. 06, 2023
 
 **New function:** `PlotLine()` is planned to be added for illustrate line chart of global metrics of treatment ranking (i.e. SUCRA and P-score) using object of class *rankinma* set by function `SetMetrics()`.
 \
 
 ## rankinma 0.1.2
 
-Date: Jan. 31, 2023
+### Date: Jan. 31, 2023
 
 **New function:** `PlotBar()` is added for illustrate bar chart of global metrics of treatment ranking (i.e. SUCRA and P-score) using object of class *rankinma* set by function `SetMetrics()`.
 \
 
 ## rankinma 0.1.1 
 
-Date: Jan. 30, 2023
+### Date: Jan. 30, 2023
 
 **New function:** `GetMetrics()` is added for getting metrics of treatment ranking from object of class *netmeta*.
 \
 
 ## rankinma 0.1.0
 
-Date: Jan. 29, 2023
+### Date: Jan. 29, 2023
 
 Build rankinma with first two functions including `SetMetrics()` and `PlotBeads()`.
 

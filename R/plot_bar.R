@@ -11,7 +11,8 @@
 #'        This parameter is only for probabilities but not global metrics of
 #'        treatment ranking.
 #' @param merge LOGIC value for indicating whether merge bar charts together.
-#' @param color LIST of colors for treatments in a network meta-analysis.
+#' @param color LIST of colors for treatments in a network meta-analysis,
+#'        or CHARACTER of a color for the bar on not accumulated bar chart.
 #'
 #' @return
 #' **PlotBar()** returns a bar chart.
@@ -45,6 +46,7 @@
 #' ## End(Not run)
 #'
 #' @export PlotBar
+
 
 PlotBar <- function(data,
                     accum = NULL,
@@ -103,8 +105,13 @@ PlotBar <- function(data,
                             ifelse(argMerge == FALSE, FALSE,
                                    TRUE)))
 
-  lgcColor <- ifelse(is.null(color), FALSE,
-                     length(color) != data$n.tx)
+  lgcColor  <- ifelse(is.null(color), FALSE,
+                      ifelse(argAccum == TRUE,
+                             ifelse(length(color) != data$n.tx, TRUE, FALSE),
+                             ifelse(length(color) != 1,
+                                    ifelse(length(color) != data$n.tx,
+                                           TRUE, FALSE),
+                                    FALSE)))
 
   cat("Check arguments:\n")
 
@@ -139,23 +146,62 @@ PlotBar <- function(data,
         fill = TRUE, sep = "")
   }
 
-  if (isFALSE(is.null(color))) {
-    if (length(color) != data$n.tx) {
+  if (data$metrics.name == "Probabilities") {
+    if (isFALSE(is.null(color))) {
+      if (argAccum == TRUE) {
+        if (length(color) != data$n.tx) {
+          cat(paste(" Color ---------------------------------------------------- X\n",
+                    ' REQUIRE: Argument of "color" must list colors for
+              **EACH TREATMENT** when using "Probabilities" as metrics.'),
+              fill = TRUE, sep = "")
+        } else {
+          cat(paste(" Color ---------------------------------------------------- V"),
+              fill = TRUE, sep = "")
+        }
+      } else {
+        cat(paste(" Color ---------------------------------------------------- V"),
+            fill = TRUE, sep = "")
+      }
+    } else {
+      cat(paste(" Color ---------------------------------------------------- V"),
+          fill = TRUE, sep = "")
+    }
+  } else if (isFALSE(is.null(color))) {
+    if (length(color) != 1 & length(color) != data$n.tx) {
       cat(paste(" Color ---------------------------------------------------- X\n",
-                ' REQUIRE: Argument of "color" must list colors for
-              **EACH TREATMENT** or **EACH POSSIBLE RANK**.'),
+                ' REQUIRE: Argument of "color" must be only single color or\n
+                length of color list equals to numbers of treatments when using
+                global metrics (e.g. SUCRA and P-score).'),
           fill = TRUE, sep = "")
     } else {
       cat(paste(" Color ---------------------------------------------------- V"),
           fill = TRUE, sep = "")
     }
+  } else {
+    cat(paste(" Color ---------------------------------------------------- V"),
+        fill = TRUE, sep = "")
   }
+
 
   if (lgcInher | lgcColor)
     stop("Correct above mentioned problem(s).")
 
   txs      <- unique(dataBar$tx)
   outcomes <- unique(dataBar$outcome)
+
+  colorTx <- data$color.txs
+
+  if (!is.null(color)) {
+    if (length(which(ls()%in%ls(pattern = "color"))) > 0) {
+      colorTx$colorTx <- rgb(col2rgb(color)[1, ]/255,
+                             col2rgb(color)[2, ]/255,
+                             col2rgb(color)[3, ]/255,
+                             data$trans)
+      for (color.i in c(1:nrow(dataBar))) {
+        dataBar[color.i, "colorTx"] <- colorTx[which(dataBar[color.i, "tx"] == colorTx$lsTx), "colorTx"]
+      }
+    }
+  }
 
   argPlotRow <- ceiling(data$n.outcome/3)
   argPlotClm <- ifelse(data$n.outcome < 3,
@@ -220,14 +266,17 @@ PlotBar <- function(data,
 
       dataBarPlot <- dataBar[dataBar$outcomes == outcome.i, ]
 
+      dataBarPlot <- dataBarPlot[order(-dataBarPlot$txs),]
+      dataBarPlot$seq.tx <- c(1:nrow(dataBarPlot))
+
       barplot(dataBarPlot[, "metrics"],
               cex.names = 0.8,
               cex.axis = 0.8,
-              xlim = c(0, length(unique(dataBarPlot$tx))),
+              xlim = c(0, max(dataBarPlot$seq.tx)),
               ylim = c(0, 1),
               names.arg = dataBarPlot$tx,
               yaxt = "n", ylab = data$metrics.name, xlab = "Treatment",
-              col = ifelse(is.null(argColor), "dodgerblue3", argColor),
+              col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]),
               width = 0.8,
               beside = FALSE,
               border = FALSE, legend = FALSE, frame = FALSE)
@@ -242,21 +291,50 @@ PlotBar <- function(data,
     par(mfrow = c(argPlotRow, argPlotClm),
         oma = c(4,4,4,0.5),
         mai = c(0.3,0.3,0.3,0.3))
-    for (i.otcm in c(1:length(unique(dataBar$outcome)))) {
-      par(mar = c(2, 4, 2, 4), xpd = TRUE)
-      barplot(dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "metrics"],
+
+    #for (i.otcm in c(1:length(unique(dataBar$outcome)))) {
+    #  par(mar = c(2, 4, 2, 4), xpd = TRUE)
+    #  barplot(dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "metrics"],
+    #          cex.names = 0.8,
+    #          cex.axis = 0.8,
+    #          xlim = c(0, length(unique(dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"]))),
+    #          ylim = c(0, 1),
+    #          names.arg = dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"],
+    #          yaxt = "n",
+    #          col = c(dataBar$colorTx),
+    #          width = 1/length(unique(dataBar$tx)),
+    #          legend = FALSE, beside = FALSE, border = FALSE)
+    #  axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
+    #  title(data$ls.outcome[i.otcm], cex.main = 0.8, font = 1, line = 0.5)
+    #}
+
+    for (outcome.i in c(1:length(outcomes))) {
+
+      dataBarPlot <- dataBar[dataBar$outcomes == outcome.i, ]
+
+      dataBarPlot <- dataBarPlot[order(-dataBarPlot$txs),]
+      dataBarPlot$seq.tx <- c(1:nrow(dataBarPlot))
+
+      barplot(dataBarPlot[, "metrics"],
               cex.names = 0.8,
               cex.axis = 0.8,
-              xlim = c(0, length(unique(dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"]))),
+              xlim = c(0, max(dataBarPlot$seq.tx)),
               ylim = c(0, 1),
-              names.arg = dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"],
-              yaxt = "n",
-              col = c(dataBar$colorTx),
-              width = 1/length(unique(dataBar$tx)),
-              legend = FALSE, beside = FALSE, border = FALSE)
+              names.arg = dataBarPlot$tx, las = 1,
+              yaxt = "n", ylab = data$metrics.name, xlab = "Treatment",
+              col = if (length(color) == data$n.tx) {
+                dataBarPlot$colorTx
+              } else {
+                ifelse(is.null(argColor), "dodgerblue3", argColor[1])
+              },
+              width = 0.8,
+              beside = FALSE,
+              border = FALSE, legend = FALSE, frame = FALSE)
       axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-      title(data$ls.outcome[i.otcm], cex.main = 0.8, font = 1, line = 0.5)
+      title(paste(data$ls.outcome[outcome.i], sep = ""),
+            cex.main = 1, font = 1, line = 0.5)
     }
+
     mtext(paste("Bar chart of " ,
                 ifelse(data$metrics.name %in% lsMetrics,
                        data$metrics.name, "???"),
@@ -270,3 +348,4 @@ PlotBar <- function(data,
   }
 
 }
+

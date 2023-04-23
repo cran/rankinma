@@ -14,6 +14,7 @@
 #' @param metrics.name STRING for metrics of treatment ranking in terms of
 #'        "SUCRA" and "P-score" for the value of surface under the cumulative
 #'        ranking curve or P-score.
+#' @param trans NUMERIC for indicating transparency of colors of treatments.
 #'
 #' @return
 #' **SetMetrics()** returns a confirmed data.frame of treatment, metrics of
@@ -48,7 +49,8 @@ SetMetrics <- function(data,
                        outcome = NULL,
                        tx = NULL,
                        metrics = NULL,
-                       metrics.name = NULL) {
+                       metrics.name = NULL,
+                       trans = 0.8) {
 
   data <- data.frame(data)
   lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score")
@@ -64,6 +66,9 @@ SetMetrics <- function(data,
                        !(namMetrics %in% colnames(data)))
   lgcDupl    <- ifelse(sum(table(data$tx, data$outcome)) == sum(table(data$tx, data$outcome) == 1),
                        FALSE, TRUE)
+  lgcTrans   <- ifelse(is.numeric(trans),
+                       ifelse(trans <= 1 & trans >= 0,
+                              FALSE, TRUE), TRUE)
 
   cat("Check variables:\n")
 
@@ -134,12 +139,22 @@ SetMetrics <- function(data,
         fill = TRUE, sep = "")
   }
 
+  if (lgcTrans) {
+    cat(paste(" Transparency   --------------------------------------------- X\n",
+              ' REQUIRE: argument "trans" must be between 0 and 1.'),
+        fill = TRUE, sep = "")
+  } else {
+    cat(paste(" Transparency   --------------------------------------------- V"),
+        fill = TRUE, sep = "")
+  }
+
   if (metrics.name == "Probabilities") {
     if (lgcTx |
         lgcOutcome |
         !(metrics.name %in% lsMetrics) |
         lgcMetrics |
-        lgcDupl) {
+        lgcDupl |
+        lgcTrans) {
       lgcOverall <- TRUE
     } else {
       lgcOverall <- FALSE
@@ -149,7 +164,8 @@ SetMetrics <- function(data,
              !(metrics.name %in% lsMetrics) |
              lgcMetrics |
              !is.numeric(data$metrics) |
-             lgcDupl) {
+             lgcDupl |
+             lgcTrans) {
     lgcOverall <- TRUE
   } else {
     lgcOverall <- FALSE
@@ -174,6 +190,10 @@ SetMetrics <- function(data,
                         seqTx  = c(1:length(unique(data$tx))),
                         colorTx = rainbow(length(unique(data$tx)))
   )
+
+  colorTrans      <- rgb(1, 1, 1, trans)
+  colorTrans      <- substring(colorTrans, 8, 9)
+  colorTx$colorTx <- paste(colorTx$colorTx, colorTrans, sep = "")
 
   data$colorTx <- NA
 
@@ -221,6 +241,7 @@ SetMetrics <- function(data,
   dataList$data      <- dataSet
   dataList$data.sets <- split(dataSet, dataSet$outcome)
   dataList$color.txs <- colorTx
+  dataList$trans     <- trans
   dataRankinma       <- dataList
 
 
@@ -245,7 +266,6 @@ SetMetrics <- function(data,
 
 }
 
-
 #' @title Display color for each treatment
 #'
 #' @author Enoch Kang
@@ -260,8 +280,9 @@ SetMetrics <- function(data,
 #' **ShowColor()** show a plot of color for each treatment.
 #'
 #' @export ShowColor
-
 ShowColor <- function(data) {
+
+  dataColor  <- data$color.txs
 
   if (!inherits(data, "rankinma"))
     stop('Argument "data" must be an object of class \"rankinma\".')
@@ -271,13 +292,13 @@ ShowColor <- function(data) {
        frame.plot = FALSE,
        xlab = "", ylab="", xaxt = "n", yaxt = "n",
        col = "white")
-  segments(rep(0.5, max(data$txs)),
-           (0.95) / max(data$txs) * unique(data$txs),
-           rep(0.7, max(data$txs)),
-           (0.95) / max(data$txs) * unique(data$txs),
+  segments(rep(0.5, max(dataColor$seqTx)),
+           (0.95) / max(dataColor$seqTx) * unique(dataColor$seqTx),
+           rep(0.7, max(dataColor$seqTx)),
+           (0.95) / max(dataColor$seqTx) * unique(dataColor$seqTx),
            lwd = 6,
-           col = data$colorTx)
-  text(rep(0.8, max(data$txs)),
-       (0.95) / max(data$txs) * unique(data$txs),
-       data$tx, pos = 4)
+           col = dataColor$colorTx)
+  text(rep(0.8, max(dataColor$seqTx)),
+       (0.95) / max(dataColor$seqTx) * unique(dataColor$seqTx),
+       dataColor$lsTx, pos = 4)
 }

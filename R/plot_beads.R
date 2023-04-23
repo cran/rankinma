@@ -101,7 +101,10 @@ PlotBeads <- function(data,
 
   if (!is.null(color)) {
     if (length(which(ls()%in%ls(pattern = "color"))) > 0) {
-      colorTx$colorTx <- color
+      colorTx$colorTx <- rgb(col2rgb(color)[1, ]/255,
+                             col2rgb(color)[2, ]/255,
+                             col2rgb(color)[3, ]/255,
+                             data$trans)
       for (color.i in c(1:nrow(dataBeadsPlot))) {
         dataBeadsPlot[color.i, "colorTx"] <- colorTx[which(dataBeadsPlot[color.i, "tx"] == colorTx$lsTx), "colorTx"]
       }

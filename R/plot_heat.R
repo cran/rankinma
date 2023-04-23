@@ -121,6 +121,8 @@ PlotHeat <- function(data,
 
   colnames(dataSmry)[c(1:3)] <- c("outcome", "n.tx", "seq.otcm")
 
+  dataSmry$seq.otcm <- max(dataSmry$seq.otcm) + 1 - dataSmry$seq.otcm
+
 
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
@@ -143,17 +145,17 @@ PlotHeat <- function(data,
 
     if (argSorttx == FALSE) {
       dataHeatPlot <- dataHeatPlot[order(-dataHeatPlot$metrics),]
-      dataHeatPlot$seq.metrics <- c(1:max(dataHeatPlot$txs))
+      dataHeatPlot$seq.metrics <- c(1:nrow(dataHeatPlot))
 
-      dataHeatPlot$xlft <- (max(dataSmry$n.tx) / max(dataHeatPlot$txs)) * dataHeatPlot$seq.metrics - 1
-      dataHeatPlot$xrgt <- (max(dataSmry$n.tx) / max(dataHeatPlot$txs)) * dataHeatPlot$seq.metrics
+      dataHeatPlot$xlft <- (max(dataSmry$n.tx) / length(dataHeatPlot$txs)) * dataHeatPlot$seq.metrics - (max(dataSmry$n.tx) / length(dataHeatPlot$txs))
+      dataHeatPlot$xrgt <- (max(dataSmry$n.tx) / length(dataHeatPlot$txs)) * dataHeatPlot$seq.metrics
     } else {
-      dataHeatPlot$xlft <- (max(dataSmry$n.tx) / max(dataHeatPlot$txs)) * dataHeatPlot$txs - 1
-      dataHeatPlot$xrgt <- (max(dataSmry$n.tx) / max(dataHeatPlot$txs)) * dataHeatPlot$txs
+      dataHeatPlot$xlft <- dataHeatPlot$txs - 1
+      dataHeatPlot$xrgt <- dataHeatPlot$txs
     }
 
-    dataHeatPlot$ybtm <- dataHeatPlot$outcomes - 0.5
-    dataHeatPlot$ytop <- dataHeatPlot$outcomes
+    dataHeatPlot$ybtm <- dataHeatPlot$seq.outcome - 0.5
+    dataHeatPlot$ytop <- dataHeatPlot$seq.outcome
 
     for (tx.i in c(dataHeatPlot$txs)) {
       rect(dataHeatPlot$xlft,

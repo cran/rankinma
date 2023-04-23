@@ -11,7 +11,8 @@
 #'        This parameter is only for probabilities but not global metrics of
 #'        treatment ranking.
 #' @param merge LOGIC value for indicating whether merge bar charts together.
-#' @param color LIST of colors for treatments in a network meta-analysis.
+#' @param color LIST of colors for treatments in a network meta-analysis,
+#'        or CHARACTER of a color for the line on not composite line chart.
 #'
 #' @return
 #' **PlotLine()** returns a line chart.
@@ -284,31 +285,47 @@ PlotLine <- function(data,
     }
 
   } else {
-    par(mar = c(5, 5, 5, 7), xpd = TRUE)
 
-    for (outcome.i in c(1:length(outcomes))) {
-      dataLinePlot <- dataLine[dataLine$outcomes == outcome.i, ]
-      plot(dataLinePlot[, "metrics"],
-           type = "line",
-           cex.names = 0.8,
-           cex.axis = 0.8,
-           xlim = c(1, max(dataLinePlot$txs)),
-           ylim = c(0, 1),
-           xaxt = "n", xlab = "Treatment",
-           yaxt = "n", ylab = data$metrics.name,
-           col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]),
-           legend = FALSE, frame.plot = FALSE)
-      axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-      axis(side = 1, cex.axis = 0.8,
-           at = dataLinePlot[, "txs"],
-           labels = dataLinePlot[, "tx"])
-      title(paste("Line chart of ", data$metrics.name, " on ",
-                  outcomes[outcome.i], sep = ""),
-            cex.main = 1, font = 1, line = 0.5)
+    if (argMerge == TRUE) {
 
-      plotTemp <- grDevices::recordPlot()
-      plotLine <- plotTemp
+      cat(paste("This function is developing..."),
+          fill = TRUE, sep = "")
+      cat(paste("Merged line chart will be available in the future."),
+          fill = TRUE, sep = "")
+
+    } else {
+
+      par(mar = c(5, 5, 5, 7), xpd = TRUE)
+
+      for (outcome.i in c(1:length(outcomes))) {
+        dataLinePlot <- dataLine[dataLine$outcomes == outcome.i, ]
+
+        dataLinePlot <- dataLinePlot[order(-dataLinePlot$txs),]
+        dataLinePlot$seq.tx <- c(1:nrow(dataLinePlot))
+
+        plot(dataLinePlot[, "metrics"],
+             type = "line",
+             cex.names = 0.8,
+             cex.axis = 0.8,
+             xlim = c(1, max(dataLinePlot$seq.tx)),
+             ylim = c(0, 1),
+             xaxt = "n", xlab = "Treatment",
+             yaxt = "n", ylab = data$metrics.name,
+             col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]),
+             legend = FALSE, frame.plot = FALSE)
+        axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
+        axis(side = 1, cex.axis = 0.8,
+             at = dataLinePlot[, "seq.tx"],
+             labels = dataLinePlot[, "tx"])
+        title(paste("Line chart of ", data$metrics.name, " on ",
+                    outcomes[outcome.i], sep = ""),
+              cex.main = 1, font = 1, line = 0.5)
+
+        plotTemp <- grDevices::recordPlot()
+        plotLine <- plotTemp
+      }
     }
   }
 
 }
+

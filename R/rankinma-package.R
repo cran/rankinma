@@ -13,6 +13,7 @@
 #' @importFrom graphics segments
 #' @importFrom graphics text
 #' @importFrom graphics title
+#' @importFrom grDevices col2rgb
 #' @importFrom grDevices rainbow
 #' @importFrom grDevices recordPlot
 #' @importFrom grDevices rgb

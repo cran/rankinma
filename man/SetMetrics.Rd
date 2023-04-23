@@ -9,7 +9,8 @@ SetMetrics(
   outcome = NULL,
   tx = NULL,
   metrics = NULL,
-  metrics.name = NULL
+  metrics.name = NULL,
+  trans = 0.8
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ be "NULL" when using "Probabilities" as metrics.}
 \item{metrics.name}{STRING for metrics of treatment ranking in terms of
 "SUCRA" and "P-score" for the value of surface under the cumulative
 ranking curve or P-score.}
+
+\item{trans}{NUMERIC for indicating transparency of colors of treatments.}
 }
 \value{
 \strong{SetMetrics()} returns a confirmed data.frame of treatment, metrics of

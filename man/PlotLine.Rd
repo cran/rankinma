@@ -15,7 +15,8 @@ treatment ranking.}
 
 \item{merge}{LOGIC value for indicating whether merge bar charts together.}
 
-\item{color}{LIST of colors for treatments in a network meta-analysis.}
+\item{color}{LIST of colors for treatments in a network meta-analysis,
+or CHARACTER of a color for the line on not composite line chart.}
 }
 \value{
 \strong{PlotLine()} returns a line chart.

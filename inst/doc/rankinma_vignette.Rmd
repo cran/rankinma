@@ -1,7 +1,7 @@
 ---
 title: "rankinma_vignette"
 author: "Enoch Kang, Chiehfeng Chen Wen-Hsuan Hou, Jin-Hua Chen, Yu-Chieh Chuang, & Edwin Chan"
-date: "April 9, 2023"
+date: "April 22, 2023"
 description: > 
   Treatment ranking in network meta-analysis.
 output: 

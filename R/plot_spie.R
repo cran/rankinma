@@ -48,7 +48,7 @@
 #' @export PlotSpie
 
 PlotSpie <- function(data,
-                      color = NULL) {
+                     color = NULL) {
 
   dataSpie <- data$data
 
@@ -103,20 +103,30 @@ PlotSpie <- function(data,
   txs      <- unique(dataSpie$tx)
   outcomes <- unique(dataSpie$outcome)
 
-  dataSpiePlot <- dataSpie
+  dataSpie <- dataSpie
 
 
-  colorOutcome <- data.frame(lsOutcome    = unique(dataSpiePlot$outcome),
-                             seqOutcome   = c(1:length(unique(dataSpiePlot$outcome))),
-                             colorOutcome = rainbow(length(unique(dataSpiePlot$outcome))))
+  colorOutcome <- data.frame(lsOutcome    = unique(dataSpie$outcome),
+                             seqOutcome   = c(1:length(unique(dataSpie$outcome))),
+                             colorOutcome = rainbow(length(unique(dataSpie$outcome))))
 
-  dataSpiePlot$colorOutcome <- NA
+  colorOutcome$colorOutcome <- rgb(col2rgb(colorOutcome$colorOutcome)[1, ]/255,
+                                   col2rgb(colorOutcome$colorOutcome)[2, ]/255,
+                                   col2rgb(colorOutcome$colorOutcome)[3, ]/255,
+                                   data$trans)
+  dataSpie$colorOutcome <- NA
+  for (color.i in c(1:nrow(dataSpie))) {
+    dataSpie[color.i, "colorOutcome"] <- colorOutcome[which(dataSpie[color.i, "outcome"] == colorOutcome$lsOutcome), "colorOutcome"]
+  }
 
   if (!is.null(color)) {
     if (length(which(ls()%in%ls(pattern = "color"))) > 0) {
-      colorOutcome$colorOutcome <- color
-      for (color.i in c(1:nrow(dataSpiePlot))) {
-        dataSpiePlot[color.i, "colorOutcome"] <- colorOutcome[which(dataSpiePlot[color.i, "outcome"] == colorOutcome$lsOutcome), "colorOutcome"]
+      colorOutcome$colorOutcome <- rgb(col2rgb(color)[1, ]/255,
+                                       col2rgb(color)[2, ]/255,
+                                       col2rgb(color)[3, ]/255,
+                                       data$trans)
+      for (color.i in c(1:nrow(dataSpie))) {
+        dataSpie[color.i, "colorOutcome"] <- colorOutcome[which(dataSpie[color.i, "outcome"] == colorOutcome$lsOutcome), "colorOutcome"]
       }
     }
   }
@@ -124,19 +134,25 @@ PlotSpie <- function(data,
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
 
-  argPlotClm <- ifelse(length(unique(dataSpiePlot$tx)) < 3,
-                     length(unique(dataSpiePlot$tx)), 3)
-  argPlotRow <- ceiling((length(unique(dataSpiePlot$tx))+1)/3)
+  argPlotClm <- ifelse(length(unique(dataSpie$tx)) < 3,
+                       length(unique(dataSpie$tx)), 3)
+  argPlotRow <- ceiling((length(unique(dataSpie$tx))+1)/3)
 
   par(mfrow = c(argPlotRow, argPlotClm),
       oma   = c(1, 1, 1, 4),
       mai   = c(0.3, 0.3, 0.3, 0.3))
-  for (treat.i in c(1:length(unique(dataSpiePlot$tx)))) {
-    TX.Spie <- unique(dataSpiePlot$tx)[treat.i]
-    for (rank.i in c(1:length(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"]))){
+  for (treat.i in c(1:length(unique(dataSpie$tx)))) {
+    TX.Spie <- unique(dataSpie$tx)[treat.i]
+
+    dataSpiePlot <- dataSpie[dataSpie$txs == treat.i, ]
+    #    dataSpiePlot <- dataSpiePlot[order(-dataSpiePlot$metrics), ]
+    #    dataSpiePlot$seq.metrics <- c(1:nrow(dataSpiePlot))
+
+    for (rank.i in c(1:length(dataSpie[dataSpie$tx == TX.Spie, "metrics"]))){
       if (rank.i > 1) {
         par(new = TRUE)
       }
+
       pie(table(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "outcome"]) / sum(table(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "outcome"])),
           labels = if(rank(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"])[rank.i] == max(rank(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"]))){
             paste(sprintf('%.2f',round(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"],2)), sep = "")
@@ -145,7 +161,8 @@ PlotSpie <- function(data,
           border = c(rgb(0.3, 1, 1, 0)),
           col = c(rep(rgb(0.3, 1, 1, 0), rank.i - 1),
                   c(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "colorOutcome"][rank.i]),
-                  rep(rgb(0.3, 1, 1, 0), 4 - rank.i)))
+                  rep(rgb(0.3, 1, 1, 0), data$n.outcome - rank.i))
+      )
     }
     title(TX.Spie,line = 0)
   }
