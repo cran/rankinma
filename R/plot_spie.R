@@ -62,34 +62,35 @@ PlotSpie <- function(data,
                              TRUE, FALSE))
 
   if (lgcInher) {
-    cat(paste(" Inherit -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".'),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit -------------------------------------------------- X\n",
+              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
   } else {
-    cat(paste(" Inherit -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit -------------------------------------------------- V")
   }
 
   if (lgcMtrcs) {
-    cat(paste(" Metrics -------------------------------------------------- X\n",
-              ' REQUIRE: Metrics should not be "Probabilities."'),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <-paste(" Metrics -------------------------------------------------- X\n",
+              ' REQUIRE: Metrics should not be "Probabilities."')
   } else {
-    cat(paste(" Metrics -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <-paste(" Metrics -------------------------------------------------- V")
   }
 
   if (lgcColor) {
-    cat(paste(" Color ---------------------------------------------------- X\n",
-              ' REQUIRE: Argument "color" must list colors for **EACH OUTCOME**.'),
-        fill = TRUE, sep = "")
+    infoLgcColor <-paste(" Color ---------------------------------------------------- X\n",
+              ' REQUIRE: Argument "color" must list colors for **EACH OUTCOME**.')
   } else {
-    cat(paste(" Color ---------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcColor <-paste(" Color ---------------------------------------------------- V")
   }
 
+
+  infoStop <- paste(infoLgcInher, "\n",
+                    infoLgcMetrics, "\n",
+                    infoLgcColor, "\n",
+                    sep = ""
+                    )
+
   if (lgcInher | lgcMtrcs | lgcColor)
-    stop("Correct above mentioned problem(s).")
+    stop(infoStop)
 
   dataSpie$importance  <- dataSpie$outcomes
   dataSpie$shape       <- 16

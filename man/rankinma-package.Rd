@@ -4,7 +4,7 @@
 \name{rankinma-package}
 \alias{rankinma}
 \alias{rankinma-package}
-\title{rankinma: Treatment Ranking in Network Meta-Analysis}
+\title{rankinma: Ranking in Network Meta-Analysis}
 \description{
 A supportive collection of functions for gathering and plotting treatment ranking metrics after network meta-analysis.
 }

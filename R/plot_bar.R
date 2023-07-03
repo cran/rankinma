@@ -55,6 +55,9 @@ PlotBar <- function(data,
 
   dataBar   <- data$data
 
+
+  # 01 CHECK arguments -----
+
   lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score")
 
   argAccum  <- ifelse(is.null(accum), FALSE,
@@ -113,81 +116,81 @@ PlotBar <- function(data,
                                            TRUE, FALSE),
                                     FALSE)))
 
-  cat("Check arguments:\n")
+
+  # 02 REPORT results from argument checking -----
 
   if (lgcInher) {
-    cat(paste(" Inherit -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".'),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: ERROR\n",
+              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
   } else {
-    cat(paste(" Inherit -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: OK")
   }
 
   if (lgcAccum) {
-    cat(paste(" Accumulative --------------------------------------------- !\n",
+    infoLgcAccum <- paste(" Accumulative: WARNING!\n",
               ' INFORM: Accumulative line chart is available for metrics
         "Probabilities" only, and *rankinma* is producing bar charts
-        with default argument in terms of `accum = FALSE` now.'),
-        fill = TRUE, sep = "")
+        with default argument in terms of `accum = FALSE` now.')
   } else {
-    cat(paste(" Accumulative --------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcAccum <- paste(" Accumulative: OK")
   }
 
   if (lgcMerge) {
-    cat(paste(" Merge ---------------------------------------------------- !\n",
+    infoLgcMerge <- paste(" Merge: WARNING!\n",
               ' INFORM: Argument "merge" should be logit value, and *rankinma*
         is producing bar charts with default argument in terms of `merge = FALSE`
-        now.'),
-        fill = TRUE, sep = "")
+        now.')
   } else {
-    cat(paste(" Merge ---------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcMerge <- paste(" Merge: OK")
   }
 
   if (data$metrics.name == "Probabilities") {
     if (isFALSE(is.null(color))) {
       if (argAccum == TRUE) {
         if (length(color) != data$n.tx) {
-          cat(paste(" Color ---------------------------------------------------- X\n",
+          infoLgcColor <- paste(" Color: ERROR\n",
                     ' REQUIRE: Argument of "color" must list colors for
-              **EACH TREATMENT** when using "Probabilities" as metrics.'),
-              fill = TRUE, sep = "")
+              **EACH TREATMENT** when using "Probabilities" as metrics.')
         } else {
-          cat(paste(" Color ---------------------------------------------------- V"),
-              fill = TRUE, sep = "")
+          infoLgcColor <- paste(" Color: OK")
         }
       } else {
-        cat(paste(" Color ---------------------------------------------------- V"),
-            fill = TRUE, sep = "")
+        infoLgcColor <- paste(" Color: OK")
       }
     } else {
-      cat(paste(" Color ---------------------------------------------------- V"),
-          fill = TRUE, sep = "")
+      infoLgcColor <- paste(" Color: OK")
     }
   } else if (isFALSE(is.null(color))) {
     if (length(color) != 1 & length(color) != data$n.tx) {
-      cat(paste(" Color ---------------------------------------------------- X\n",
+      infoLgcColor <- paste(" Color: ERROR\n",
                 ' REQUIRE: Argument of "color" must be only single color or\n
                 length of color list equals to numbers of treatments when using
-                global metrics (e.g. SUCRA and P-score).'),
-          fill = TRUE, sep = "")
+                global metrics (e.g. SUCRA and P-score).')
     } else {
-      cat(paste(" Color ---------------------------------------------------- V"),
-          fill = TRUE, sep = "")
+      infoLgcColor <- paste(" Color: OK")
     }
   } else {
-    cat(paste(" Color ---------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcColor <- paste(" Color: OK")
   }
 
 
+  infoStop <- paste(infoLgcInher, "\n",
+                    infoLgcAccum, "\n",
+                    infoLgcMerge, "\n",
+                    infoLgcColor, "\n",
+                    sep = ""
+                    )
+
   if (lgcInher | lgcColor)
-    stop("Correct above mentioned problem(s).")
+    stop(infoStop)
+
+  # 03 PREPARE data -----
 
   txs      <- unique(dataBar$tx)
   outcomes <- unique(dataBar$outcome)
+
+
+  ## 03.1 SET colors by user-defined colors -----
 
   colorTx <- data$color.txs
 
@@ -203,12 +206,17 @@ PlotBar <- function(data,
     }
   }
 
+  ## 03.2 SET parameters for bar chart -----
+
   argPlotRow <- ceiling(data$n.outcome/3)
   argPlotClm <- ifelse(data$n.outcome < 3,
                        data$n.outcome, 3)
 
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
+
+
+  # 04 PLOT bar chart -----
 
   if (data$metrics.name == "Probabilities") {
 
@@ -241,9 +249,9 @@ PlotBar <- function(data,
             cex.main = 1, font = 1, line = 0.5)
 
       segments(rep(data$n.tx+0.2, nrow(dataBarPlot)),
-               (0.95) / nrow(dataBarPlot) * dataBarPlot$txs,
+               (0.95) / nrow(dataBarPlot) * (max(dataBarPlot$txs) + 1 - dataBarPlot$txs),
                rep(data$n.tx+0.3, nrow(dataBarPlot)),
-               (0.95) / nrow(dataBarPlot) * dataBarPlot$txs,
+               (0.95) / nrow(dataBarPlot) * (max(dataBarPlot$txs) + 1 - dataBarPlot$txs),
                lwd = 10,
                col = if (is.null(argColor)) {
                  c(dataBarPlot$colorTx)
@@ -252,7 +260,7 @@ PlotBar <- function(data,
       )
 
       text(rep(data$n.tx+0.4, nrow(dataBarPlot)),
-           (0.95) / nrow(dataBarPlot) * dataBarPlot$txs,
+           (0.95) / nrow(dataBarPlot) * (max(dataBarPlot$txs) + 1 - dataBarPlot$txs),
            paste("Rank ", dataBarPlot$rank, sep = ""),
            pos = 4,
            cex = 0.8)

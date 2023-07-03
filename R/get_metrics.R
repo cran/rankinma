@@ -62,6 +62,8 @@ GetMetrics <- function(data,
                        model   = "random",
                        simt    = 1000) {
 
+  # 01 CHECK arguments -----
+
   lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score", "ALL")
 
   argOutcome <- ifelse(!is.null(outcome), outcome, "outcome")
@@ -78,72 +80,106 @@ GetMetrics <- function(data,
   lgcMetrics <- !(argMetrics %in% lsMetrics)
   lgcModel   <- isTRUE(argModel == "unspecified")
 
-  cat("Check variables:\n")
+
+  # 02 REPORT results from argument checking -----
 
   if (lgcInher) {
-    cat(paste(" Inherit -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "data" must be an object of class \"netmeta\".'),
-        fill = TRUE, sep = "")
+   infoLgcInher <- paste(" Inherit: ERROR\n",
+              ' REQUIRE: Argument "data" must be an object of class \"netmeta\".')
   } else {
-    cat(paste(" Inherit -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: OK")
   }
 
   if (argOutcome == "outcome") {
-    cat(paste(" Outcome -------------------------------------------------- !\n",
-              ' SUGGEST: It is better to have a \"specific name\" in the argument "outcome."'),
-        fill = TRUE, sep = "")
+    infoLgcOutcome <- paste(" Outcome: WARNING!\n",
+              ' SUGGEST: It is better to have a \"specific name\" in the argument "outcome."')
   } else {
-    cat(paste(" Outcome -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcOutcome <- paste(" Outcome: OK")
   }
 
   if (lgcPrefer) {
-    cat(paste(" Prefer  -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "prefer" must be \"small\" or  \"large\".'),
-        fill = TRUE, sep = "")
+    infoLgcPrefer <- paste(" Prefer: ERROR\n",
+              ' REQUIRE: Argument "prefer" must be \"small\" or  \"large\".')
   } else {
-    cat(paste(" Prefer  -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcPrefer <- paste(" Prefer: OK")
   }
 
   if (lgcMetrics) {
-    cat(paste(" Metrics -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "metrics" must be \"Probabilities\", \"SUCRA\", or  \"P-score\".'),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <- paste(" Metrics: ERROR\n",
+              ' REQUIRE: Argument "metrics" must be \"Probabilities\", \"SUCRA\", or  \"P-score\".')
   } else {
-    cat(paste(" Metrics -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <- paste(" Metrics: OK")
   }
 
   if (lgcModel) {
-    cat(paste(" Model   -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "model" must be \"random\" or  \"common\".'),
-        fill = TRUE, sep = "")
+    infoLgcModel <- paste(" Model: ERROR\n",
+              ' REQUIRE: Argument "model" must be \"random\" or  \"common\".')
   } else {
-    cat(paste(" Model   -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcModel <- paste(" Model: OK")
   }
+
+  infoStop <- paste(infoLgcInher, "\n",
+                    infoLgcOutcome, "\n",
+                    infoLgcPrefer, "\n",
+                    infoLgcMetrics, "\n",
+                    infoLgcModel, "\n",
+                    sep = ""
+                    )
 
   if (lgcInher |
       lgcPrefer |
       lgcMetrics |
       lgcModel)
-    stop("Correct above mentioned problem(s).")
+    stop(infoStop)
+
+
+  # 03 GET treatment ranking metrics from object of *netmeta* class -----
+  ## 03.1 GET probabilities from object of *netmeta* class -----
 
   if (argMetrics == "Probabilities") {
     if (argModel == "random") {
-      dataGet <- as.data.frame(
-        t(netmeta::rankogram(data, nsim = simt, random = TRUE,
-                             small.values = argPrefer)$ranking.matrix.random)
-      )
+      outRankogram <- netmeta::rankogram(data, nsim = simt,
+                                           random = TRUE,
+                                           small.values = argPrefer)
+      dataGetProb  <- as.data.frame(t(outRankogram$ranking.matrix.random))
+
+      colnames(dataGetProb) <- paste(colnames(dataGetProb),
+                                     rep("Prob",
+                                         length(dataGetProb)),
+                                     sep = "")
+
+      dataGetProbCum <- as.data.frame(t(outRankogram$cumrank.matrix.random))
+      colnames(dataGetProbCum) <- paste(colnames(dataGetProbCum),
+                                     rep("Cum",
+                                         length(dataGetProbCum)),
+                                     sep = "")
+
+      #dataGetProbCum$rank <- seq(1:length(dataGetProbCum))
+      dataGet <- cbind(dataGetProb, dataGetProbCum)
+
     } else if (argModel == "common") {
-      dataGet <- as.data.frame(
-        t(netmeta::rankogram(data, nsim = simt, random = FALSE,
-                             small.values = argPrefer)$ranking.matrix.common)
-      )
+      outRankogram <- netmeta::rankogram(data, nsim = simt,
+                                           random = FALSE,
+                                           small.values = argPrefer)
+      dataGetProb  <- as.data.frame(t(outRankogram$ranking.matrix.common))
+      colnames(dataGetProb) <- paste(colnames(dataGetProb),
+                                     rep("Prob",
+                                         length(dataGetProb)),
+                                     sep = "")
+
+      dataGetProbCum <- as.data.frame(t(outRankogram$cumrank.matrix.common))
+      colnames(dataGetProbCum) <- paste(colnames(dataGetProbCum),
+                                        rep("Cum",
+                                            length(dataGetProbCum)),
+                                        sep = "")
+
+      #dataGetProbCum$rank <- seq(1:length(dataGetProbCum))
+      dataGet <- cbind(dataGetProb, dataGetProbCum)
     }
   }
+
+
+  ## 03.2 GET P-best from object of *netmeta* class -----
 
   if (argMetrics == "P-best") {
     if (argModel == "random") {
@@ -157,6 +193,9 @@ GetMetrics <- function(data,
     }
   }
 
+
+  ## 03.3 GET SUCRA from object of *netmeta* class -----
+
   if (argMetrics == "SUCRA") {
     if (argModel == "random") {
       dataGet <- as.data.frame(
@@ -169,6 +208,9 @@ GetMetrics <- function(data,
     }
   }
 
+
+  ## 03.4 GET P-score from object of *netmeta* class -----
+
   if (argMetrics == "P-score") {
     if (argModel == "random") {
       dataGet <- as.data.frame(
@@ -180,6 +222,9 @@ GetMetrics <- function(data,
                          small.values = argPrefer)$ranking.common)
     }
   }
+
+
+  ## 03.5 GET all global metrics from object of *netmeta* class -----
 
   if (argMetrics == "ALL") {
     if (argModel == "random") {
@@ -207,9 +252,15 @@ GetMetrics <- function(data,
     }
   }
 
+
+  # 04 BUILD an object as output of function `GetMetrics()` -----
+
   if (argMetrics == "Probabilities") {
-    dataGet$tx   <- colnames(dataGet)
-    dataGet$rank <- rownames(dataGet)
+    dataGet$tx   <- colnames(dataGet)[c(1:nrow(dataGet))]
+    dataGet$tx   <- substr(dataGet$tx,
+                           1,
+                           nchar(dataGet$tx) - 4)
+    dataGet$rank <- as.numeric(rownames(dataGet))
     dataGet      <- dataGet[, c(length(dataGet)-1,
                                 length(dataGet),
                                 2:length(dataGet)-2)]
@@ -230,6 +281,9 @@ GetMetrics <- function(data,
   }
 
   rownames(dataGet) <- c(1:nrow(dataGet))
+
+
+  # 05 REPORT returns of function `GetMetrics()` -----
 
   cat(paste("Summary of metrics:\n",
             "Metrics:    ", argMetrics, "\n",

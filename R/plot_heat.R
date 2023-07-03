@@ -63,37 +63,37 @@ PlotHeat <- function(data,
                                       TRUE)))
 
   if (lgcInher) {
-    cat(paste(" Inherit -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".'),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: ERROR\n",
+              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
   } else {
-    cat(paste(" Inherit -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: OK")
   }
 
   if (lgcMtrcs) {
-    cat(paste(" Metrics -------------------------------------------------- X\n",
-              ' REQUIRE: Metrics should not be "Probabilities."'),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <- paste(" Metrics: ERROR\n",
+              ' REQUIRE: Metrics should not be "Probabilities."')
   } else {
-    cat(paste(" Metrics -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <- paste(" Metrics: OK")
   }
 
   if (lgcSorttx) {
-    cat(paste(" Sort ----------------------------------------------------- !\n",
+    infoLgcScorttx <- paste(" Sort: WARNING!\n",
               ' INFORM: Argument "sorttx" should be logit value, and *rankinma*
         is producing bar charts with default argument in terms of `sorttx = FALSE`
-        now.'),
-        fill = TRUE, sep = "")
+        now.')
   } else {
-    cat(paste(" Sort ----------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcScorttx <- paste(" Sort: OK")
   }
 
 
+  infoStop <- paste(infoLgcInher, "\n",
+                    infoLgcMetrics, "\n",
+                    infoLgcScorttx, "\n",
+                    sep = ""
+                    )
+
   if (lgcInher | lgcMtrcs | lgcSorttx)
-    stop("Correct above mentioned problem(s).")
+    stop(infoStop)
 
   dataHeat$seq.outcome <- max(dataHeat$outcomes) + 1 - dataHeat$outcomes
   dataHeat$seq.tx      <- max(dataHeat$txs) + 1 - dataHeat$txs

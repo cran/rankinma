@@ -4,16 +4,20 @@
 \alias{PlotLine}
 \title{Illustrate line chart of treatment ranking metrics}
 \usage{
-PlotLine(data, compo = NULL, merge = NULL, color = NULL)
+PlotLine(data, accum = NULL, compo = NULL, merge = NULL, color = NULL)
 }
 \arguments{
 \item{data}{DATA of metrics for treatment ranking.}
+
+\item{accum}{LOGIC value for indicating whether use accumulative probabilities.
+This parameter is only for probabilities but not global metrics of
+treatment ranking.}
 
 \item{compo}{LOGIC value for indicating whether use composite line chart.
 This parameter is only for probabilities but not global metrics of
 treatment ranking.}
 
-\item{merge}{LOGIC value for indicating whether merge bar charts together.}
+\item{merge}{LOGIC value for indicating whether merge line charts together.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis,
 or CHARACTER of a color for the line on not composite line chart.}

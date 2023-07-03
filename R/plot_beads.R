@@ -54,34 +54,34 @@ PlotBeads <- function(data,
                              TRUE, FALSE))
 
   if (lgcInher) {
-    cat(paste(" Inherit -------------------------------------------------- X\n",
-              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".'),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: ERROR\n",
+              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
   } else {
-    cat(paste(" Inherit -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcInher <- paste(" Inherit: OK")
   }
 
   if (lgcMtrcs) {
-    cat(paste(" Metrics -------------------------------------------------- X\n",
-              ' REQUIRE: Metrics should not be "Probabilities."'),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <- paste(" Metrics: ERROR\n",
+              ' REQUIRE: Metrics should not be "Probabilities."')
   } else {
-    cat(paste(" Metrics -------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcMetrics <- paste(" Metrics: OK")
   }
 
   if (lgcColor) {
-    cat(paste(" Color ---------------------------------------------------- X\n",
-              ' REQUIRE: Argument "color" must list colors for **EACH TREATMENT**.'),
-        fill = TRUE, sep = "")
+    infoLgcColor <- paste(" Color: ERROR\n",
+              ' REQUIRE: Argument "color" must list colors for **EACH TREATMENT**.')
   } else {
-    cat(paste(" Color ---------------------------------------------------- V"),
-        fill = TRUE, sep = "")
+    infoLgcColor <- paste(" Color: OK")
   }
 
+  infoStop <- paste(infoLgcInher, "\n",
+                    infoLgcMetrics, "\n",
+                    infoLgcColor, "\n",
+                    sep = ""
+                    )
+
   if (lgcInher | lgcMtrcs | lgcColor)
-    stop("Correct above mentioned problem(s).")
+    stop(infoStop)
 
   dataBeads$importance  <- dataBeads$outcomes
   dataBeads$shape       <- 16
@@ -147,7 +147,7 @@ PlotBeads <- function(data,
          (data$n.outcome - 0.5) / data$n.tx * c(1:data$n.tx),
          pch = dataBeadsPlot$shape,
          col = c(unique(dataBeadsPlot$colorTx)),
-         bg = c(unique(dataBeadsPlot$colorTx)))
+         bg = c(unique(dataBeadsPlot$colorTx)), cex = 2)
 
   text(c(rep(1.15, data$n.tx)),
        (data$n.outcome - 0.5) / data$n.tx * c(1:data$n.tx),
