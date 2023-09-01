@@ -1,13 +1,14 @@
 ---
-title: "rankinma_vignette"
+title: "An overview on rankinma"
 author: "Enoch Kang, Chiehfeng Chen Wen-Hsuan Hou, Jin-Hua Chen, Yu-Chieh Chuang, & Edwin Chan"
-date: "July 03, 2023"
+date: "August 31, 2023"
 description: > 
   Ranking in network meta-analysis.
 output: 
   rmarkdown::html_vignette:
     toc: TRUE
     md_keep: TRUE
+    html: TRUE
 vignette: >
   %\VignetteIndexEntry{rankinma_vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -28,8 +29,6 @@ knitr::include_graphics("rankinma_logo.png")
 ```
 
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/rankinma)](https://cran.r-project.org/package=rankinma)
-[![Monthly Downloads](https://cranlogs.r-pkg.org:443/badges/rankinma)](https://cranlogs.r-pkg.org:443/badges/rankinma)
-[![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/rankinma)](https://cran.r-project.org/package=rankinma)
 
 
 ## Brief overview
@@ -325,3 +324,18 @@ dataRankinma <- SetMetrics(dataMetrics,
 PlotBeads(data = dataRankinma)
 > ```
 >
+
+
+## Reference
+
+Salanti, G., Ades, A. E., & Ioannidis, J. P. (2011). Graphical methods and numerical summaries for presenting results from multiple-treatment meta-analysis: an overview and tutorial. **Journal of clinical epidemiology**, *64(2)*, 163-171.
+
+Chaimani, A., Higgins, J. P., Mavridis, D., Spyridonos, P., & Salanti, G. (2013). Graphical tools for network meta-analysis in STATA. **PloS one**, *8(10)*, e76654.
+
+Van Valkenhoef, G., Tervonen, T., Zwinkels, T., De Brock, B., & Hillege, H. (2013). ADDIS: a decision support system for evidence-based medicine. **Decision Support Systems**, *55(2)*, 459-475.
+
+Rücker, G., & Schwarzer, G. (2015). Ranking treatments in frequentist network meta-analysis works without resampling methods. **BMC medical research methodology**, *15(1)*, 1-9.
+
+Daly, C. H., Mbuagbaw, L., Thabane, L., Straus, S. E., & Hamid, J. S. (2020). Spie charts for quantifying treatment effectiveness and safety in multiple outcome network meta-analysis: a proof-of-concept study. **BMC Medical Research Methodology**, *20*, 1-13.
+
+Balduzzi, S., Rücker, G., Nikolakopoulou, A., Papakonstantinou, T., Salanti, G., Efthimiou, O., & Schwarzer, G. (2023). netmeta: An R package for network meta-analysis using frequentist methods. **Journal of Statistical Software**, *106*, 1-40.

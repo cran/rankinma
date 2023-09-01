@@ -4,12 +4,33 @@
 \alias{PlotBeads}
 \title{Illustrate beading plot}
 \usage{
-PlotBeads(data, color = NULL)
+PlotBeads(
+  data,
+  color = NULL,
+  szPnt = NULL,
+  szFntTtl = NULL,
+  szFntTtlX = NULL,
+  szFntX = NULL,
+  szFntY = NULL,
+  szFntLgnd = NULL
+)
 }
 \arguments{
 \item{data}{DATA of metrics for treatment ranking.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis.}
+
+\item{szPnt}{NUMERIC value for indicating point size of ranking metrics.}
+
+\item{szFntTtl}{NUMERIC value for indicating font size of main title.}
+
+\item{szFntTtlX}{NUMERIC value for indicating font size of title on X-axis.}
+
+\item{szFntX}{NUMERIC value for indicating font size of numeric scale on X-axis.}
+
+\item{szFntY}{NUMERIC value for indicating font size of outcome name(s).}
+
+\item{szFntLgnd}{NUMERIC value for indicating legend font size.}
 }
 \value{
 \strong{PlotBeads()} returns a beading plot.

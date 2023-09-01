@@ -4,23 +4,33 @@
 \alias{PlotLine}
 \title{Illustrate line chart of treatment ranking metrics}
 \usage{
-PlotLine(data, accum = NULL, compo = NULL, merge = NULL, color = NULL)
+PlotLine(
+  data,
+  accum = NULL,
+  compo = NULL,
+  merge = NULL,
+  color = NULL,
+  rotateX = NULL
+)
 }
 \arguments{
 \item{data}{DATA of metrics for treatment ranking.}
 
 \item{accum}{LOGIC value for indicating whether use accumulative probabilities.
-This parameter is only for probabilities but not global metrics of
-treatment ranking.}
+This parameter is only for probabilities but not global metrics
+of treatment ranking.}
 
 \item{compo}{LOGIC value for indicating whether use composite line chart.
-This parameter is only for probabilities but not global metrics of
-treatment ranking.}
+This parameter is only for probabilities but not global metrics
+of treatment ranking.}
 
 \item{merge}{LOGIC value for indicating whether merge line charts together.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis,
 or CHARACTER of a color for the line on not composite line chart.}
+
+\item{rotateX}{NUMERIC value between 0 and 360 for rotating x axis labels of
+line chart.}
 }
 \value{
 \strong{PlotLine()} returns a line chart.
@@ -58,7 +68,4 @@ Salanti, G. (2013). Graphical tools for network meta-analysis in STATA.
 \code{\link{GetMetrics}}, \code{\link{SetMetrics}},
 \code{\link{PlotBeads}}, \code{\link{PlotBar}},
 \code{\link{PlotHeat}}, \code{\link{PlotSpie}}
-}
-\author{
-Enoch Kang
 }

@@ -2,23 +2,52 @@
 % Please edit documentation in R/rankinma-package.R
 \docType{package}
 \name{rankinma-package}
-\alias{rankinma}
 \alias{rankinma-package}
 \title{rankinma: Ranking in Network Meta-Analysis}
 \description{
-A supportive collection of functions for gathering and plotting treatment ranking metrics after network meta-analysis.
-}
-\author{
-\strong{Maintainer}: Enoch Kang \email{y.enoch.kang@gmail.com} (\href{https://orcid.org/0000-0002-4903-942X}{ORCID}) [translator]
+\emph{rankinma} is an R package that supports users to easily obtain and
+visualize various metrics of treatment ranking from network meta-analysis
+no matter using either frequentist or Bayesian approach. Development of package
+\emph{rankinma} is based on \bold{R version 4.2.2 (2022-10-31 ucrt)}.
+Extra imported packages are as follows:
 
-Authors:
 \itemize{
-  \item Cheihfeng Chen \email{clifchen@tmu.edu.tw} (\href{https://orcid.org/0000-0002-1595-6553}{ORCID})
-  \item Wen-Hsuan Hou (\href{https://orcid.org/0000-0002-4376-6298}{ORCID})
-  \item Jin-Hua Chen \email{jh_chen@tmu.edu.tw} (\href{https://orcid.org/0000-0002-3130-4125}{ORCID})
-  \item Yu-Chieh Chuang \email{b101104079@tmu.edu.tw} (\href{https://orcid.org/0000-0002-7124-6556}{ORCID})
-  \item Edwin Chan
+\item \href{https://cran.r-project.org/src/contrib/Archive/mvtnorm/mvtnorm_1.1-3.tar.gz}{\emph{mvtnorm} (version 1.1-3)}
+\item \href{https://cran.r-project.org/src/contrib/Archive/netmeta/netmeta_2.6-0.tar.gz}{\emph{netmeta} (version 2.6-0)}
 }
-
 }
-\keyword{internal}
+\details{
+Current version consists of seven functions, including two functions for
+data preparation (function \code{\link{GetMetrics}} and \code{\link{SetMetrics}})
+and five functions for visualization of treatment ranking metrics (i.e.
+\code{\link{PlotBeads}}, \code{\link{PlotLine}}, \code{\link{PlotBar}},
+\code{\link{PlotHeat}}, and \code{\link{PlotSpie}}). Probabilities of treatments
+on each possible rank can be visualized using \code{\link{PlotLine}} and \code{\link{PlotBar}}.
+Due to concise information, \code{\link{PlotBeads}} is recommended to be used for
+global metrics of treatment ranking, such as \bold{P-score} and \bold{SUCRA}. The other four
+visualization functions can also generate graphics of the global metrics.
+}
+\references{
+\enumerate{
+\item Salanti, G., Ades, A. E., & Ioannidis, J. P. (2011). Graphical methods and
+numerical summaries for presenting results from multiple-treatment meta-analysis:
+an overview and tutorial. \strong{Journal of clinical epidemiology}, \emph{64(2)}, 163-171.
+\item Chaimani, A., Higgins, J. P., Mavridis, D., Spyridonos, P., & Salanti, G.
+(2013). Graphical tools for network meta-analysis in STATA. \strong{PloS one}, \emph{8(10)},
+e76654.
+\item Van Valkenhoef, G., Tervonen, T., Zwinkels, T., De Brock, B., & Hillege, H.
+(2013). ADDIS: a decision support system for evidence-based medicine.
+\strong{Decision Support Systems}, \emph{55(2)}, 459-475.
+\item Rücker, G., & Schwarzer, G. (2015). Ranking treatments in frequentist network
+meta-analysis works without resampling methods. \strong{BMC medical research methodology},
+\emph{15(1)}, 1-9.
+\item Daly, C. H., Mbuagbaw, L., Thabane, L., Straus, S. E., & Hamid, J. S. (2020).
+Spie charts for quantifying treatment effectiveness and safety in multiple outcome
+network meta-analysis: a proof-of-concept study. \strong{BMC Medical Research Methodology},
+\emph{20}, 1-13.
+\item Balduzzi, S., Rücker, G., Nikolakopoulou, A., Papakonstantinou, T., Salanti, G.,
+Efthimiou, O., & Schwarzer, G. (2023). netmeta: An R package for network meta-analysis
+using frequentist methods. \strong{Journal of Statistical Software}, \emph{106}, 1-40.
+}
+}
+\keyword{package}

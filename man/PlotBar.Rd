@@ -4,19 +4,22 @@
 \alias{PlotBar}
 \title{Illustrate bar chart of treatment ranking metrics}
 \usage{
-PlotBar(data, accum = NULL, merge = NULL, color = NULL)
+PlotBar(data, accum = NULL, merge = NULL, color = NULL, rotateX = NULL)
 }
 \arguments{
 \item{data}{DATA of metrics for treatment ranking.}
 
 \item{accum}{LOGIC value for indicating whether use accumulative probabilities.
-This parameter is only for probabilities but not global metrics of
-treatment ranking.}
+This parameter is only for probabilities but not global metrics
+of treatment ranking.}
 
 \item{merge}{LOGIC value for indicating whether merge bar charts together.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis,
 or CHARACTER of a color for the bar on not accumulated bar chart.}
+
+\item{rotateX}{NUMERIC value between 0 and 360 for rotating x axis labels of
+bars.}
 }
 \value{
 \strong{PlotBar()} returns a bar chart.
@@ -54,7 +57,4 @@ medicine. \strong{Decision Support Systems}, \emph{55(2)}, 459-475.
 \code{\link{GetMetrics}}, \code{\link{SetMetrics}},
 \code{\link{PlotBeads}}, \code{\link{PlotLine}},
 \code{\link{PlotHeat}}, \code{\link{PlotSpie}}
-}
-\author{
-Enoch Kang
 }

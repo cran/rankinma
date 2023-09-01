@@ -4,12 +4,17 @@
 \alias{PlotHeat}
 \title{Illustrate heat plot for treatment ranking}
 \usage{
-PlotHeat(data, sorttx = NULL)
+PlotHeat(data, sorttx = NULL, rotateX = NULL, szFntY = NULL)
 }
 \arguments{
 \item{data}{DATA of metrics for treatment ranking.}
 
 \item{sorttx}{LOGIC value for indicating whether sort heat plot by treatments.}
+
+\item{rotateX}{NUMERIC value between 0 and 360 for rotating x axis labels of
+heat plot.}
+
+\item{szFntY}{NUMERIC value for indicating font size of outcome name(s).}
 }
 \value{
 \strong{PlotHeat()} returns a heat plot.
@@ -46,7 +51,4 @@ PlotHeat(data, sorttx = NULL)
 \code{\link{GetMetrics}}, \code{\link{SetMetrics}},
 \code{\link{PlotBeads}}, \code{\link{PlotBar}},
 \code{\link{PlotLine}}, \code{\link{PlotSpie}}
-}
-\author{
-Enoch Kang
 }

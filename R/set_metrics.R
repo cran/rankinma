@@ -1,7 +1,5 @@
 #' @title Setup data of treatment ranking metrics for rankinma
 #'
-#' @author Enoch Kang
-#'
 #' @description
 #' **SetMetrics()** is a function for checking and preparing data set of metrics
 #' for further ploting in *rankinma*.
@@ -19,6 +17,18 @@
 #' @return
 #' **SetMetrics()** returns a confirmed data.frame of treatment, metrics of
 #' treatment ranking, and outcome name.
+#' \item{metrics.name}{A string shows type of metrics of treatment ranking.}
+#' \item{ls.outcome}{Strings list outcomes.}
+#' \item{ls.tx}{Strings list treatments.}
+#' \item{n.outcome}{An integer shows numbers of outcomes.}
+#' \item{n.tx}{An integer shows numbers of treatments.}
+#' \item{data}{A data frame consists of seven columns of core information among
+#'       all outcomes.}
+#' \item{data.sets}{A list shows data frame of core information by each outcome.}
+#' \item{ptrn.tx}{A data frame shows treatments on each outcome.}
+#' \item{ptrn.outcome}{A data frame shows outcomes by treatments.}
+#' \item{color.txs}{A data frame shows color of each treatment.}
+#' \item{trans}{A numeric value shows transparency for colors of each treatment.}
 #'
 #' @seealso \code{\link{GetMetrics}}
 #'
@@ -73,6 +83,9 @@ SetMetrics <- function(data,
                        ifelse(trans <= 1 & trans >= 0,
                               FALSE, TRUE), TRUE)
 
+  infoLgcWarning <- getOption("warn")
+  options(warn = -1)
+  on.exit(options(warn = infoLgcWarning))
 
   # 02 REPORT results from argument checking -----
 
@@ -175,8 +188,9 @@ SetMetrics <- function(data,
 
   # 03 PREPARE data -----
 
-  txs      <- unique(data$tx)
-  outcomes <- unique(data$outcome)
+  txs          <- unique(data$tx)
+  outcomes     <- unique(data$outcome)
+  infoOutcomes <- length(outcomes)
 
   for (i in c(1:nrow(data))) {
     data[i, "txs"] <- which(as.character(txs) == as.character(data[i, "tx"]))
@@ -240,111 +254,115 @@ SetMetrics <- function(data,
   dataSet <- dataSet[order(dataSet$outcomes), ]
 
 
-  ## 03.3 BUILD a table of treatments patterns (txs on outcomes)  -----
-  if (metrics.name != "Probabilities") {
-    mtxTxOutcome <- table(dataSet$outcome, dataSet$tx)
+  if (infoOutcomes > 1) {
 
-    tblTxOutcome <- data.frame(mtxTxOutcome[, 1])
+    ## 03.3 BUILD a table of treatments patterns (txs on outcomes)  -----
+    if (metrics.name != "Probabilities") {
+      mtxTxOutcome <- table(dataSet$outcome, dataSet$tx)
 
-    for (tx.i in c(1:nrow(tblTxOutcome))) {
-      tblTxOutcome[tx.i, c(2:length(colnames(mtxTxOutcome)))] <- mtxTxOutcome[tx.i, c(2:length(colnames(mtxTxOutcome)))]
-    }
+      tblTxOutcome <- data.frame(mtxTxOutcome[, 1])
 
-    colnames(tblTxOutcome)[c(1:length(colnames(mtxTxOutcome)))] <- colnames(mtxTxOutcome)
-
-    tblTxOutcome$nTx <- rowSums(tblTxOutcome)
-
-    tblTxOutcome$patternTx <- NA
-
-    for (tx.i in c(1:(length(tblTxOutcome)-2))) {
-      if (tx.i == 1) {
-        tblTxOutcome[, "patternTx"] <- tblTxOutcome[, tx.i]
-      } else {
-        tblTxOutcome[, "patternTx"] <- paste(tblTxOutcome[, "patternTx"],
-                                             tblTxOutcome[, tx.i],
-                                             sep = "")
+      for (tx.i in c(1:nrow(tblTxOutcome))) {
+        tblTxOutcome[tx.i, c(2:length(colnames(mtxTxOutcome)))] <- mtxTxOutcome[tx.i, c(2:length(colnames(mtxTxOutcome)))]
       }
-    }
 
-    tblTxOutcome$Patterns <- NA
+      colnames(tblTxOutcome)[c(1:length(colnames(mtxTxOutcome)))] <- colnames(mtxTxOutcome)
 
-    for (outcome.i in c(1:nrow(tblTxOutcome))) {
-      pattern <- which(names(table(tblTxOutcome$patternTx)) == tblTxOutcome[outcome.i, "patternTx"])
-      tblTxOutcome[outcome.i, "Patterns"] <- pattern
-    }
+      tblTxOutcome$nTx <- rowSums(tblTxOutcome)
 
-    tblTxOutcome$pattern <- NA
+      tblTxOutcome$patternTx <- NA
 
-    for (outcome.i in c(1:nrow(tblTxOutcome))) {
-      txOutcome <- which(tblTxOutcome[outcome.i, c(1:(length(tblTxOutcome) - 3))] == 1)
-
-      for (tx.i in txOutcome) {
-        if (tx.i == txOutcome[1]) {
-          tblTxOutcome[outcome.i, "pattern"] <- colnames(tblTxOutcome)[tx.i]
+      for (tx.i in c(1:(length(tblTxOutcome)-2))) {
+        if (tx.i == 1) {
+          tblTxOutcome[, "patternTx"] <- tblTxOutcome[, tx.i]
         } else {
-          tblTxOutcome[outcome.i, "pattern"] <- paste(tblTxOutcome[outcome.i, "pattern"],
-                                                      colnames(tblTxOutcome)[tx.i],
-                                                      sep = ", ")
+          tblTxOutcome[, "patternTx"] <- paste(tblTxOutcome[, "patternTx"],
+                                               tblTxOutcome[, tx.i],
+                                               sep = "")
         }
       }
-    }
 
-    tblTxOutcome <- tblTxOutcome[, -c(1:(length(mtxTxOutcome) / nrow(mtxTxOutcome)), which(colnames(tblTxOutcome) == "patternTx"))]
-  }
+      tblTxOutcome$Patterns <- NA
+
+      for (outcome.i in c(1:nrow(tblTxOutcome))) {
+        pattern <- which(names(table(tblTxOutcome$patternTx)) == tblTxOutcome[outcome.i, "patternTx"])
+        tblTxOutcome[outcome.i, "Patterns"] <- pattern
+      }
+
+      tblTxOutcome$pattern <- NA
+
+      for (outcome.i in c(1:nrow(tblTxOutcome))) {
+        txOutcome <- which(tblTxOutcome[outcome.i, c(1:(length(tblTxOutcome) - 3))] == 1)
+
+        for (tx.i in txOutcome) {
+          if (tx.i == txOutcome[1]) {
+            tblTxOutcome[outcome.i, "pattern"] <- colnames(tblTxOutcome)[tx.i]
+          } else {
+            tblTxOutcome[outcome.i, "pattern"] <- paste(tblTxOutcome[outcome.i, "pattern"],
+                                                        colnames(tblTxOutcome)[tx.i],
+                                                        sep = ", ")
+          }
+        }
+      }
+
+      tblTxOutcome <- tblTxOutcome[, -c(1:(length(mtxTxOutcome) / nrow(mtxTxOutcome)), which(colnames(tblTxOutcome) == "patternTx"))]
+    }
 
 
     ## 03.4 BUILD a table of outcome patterns (outcomes on txs)  -----
-  if (metrics.name != "Probabilities") {
-    mtxOutcomeTx <- table(dataSet$tx, dataSet$outcome)
+    if (metrics.name != "Probabilities") {
+      mtxOutcomeTx <- table(dataSet$tx, dataSet$outcome)
 
-    tblOutcomeTx <- data.frame(mtxOutcomeTx[, 1])
+      tblOutcomeTx <- data.frame(mtxOutcomeTx[, 1])
 
-    for (tx.i in c(1:nrow(tblOutcomeTx))) {
-      tblOutcomeTx[tx.i, c(2:length(colnames(mtxOutcomeTx)))] <- mtxOutcomeTx[tx.i, c(2:length(colnames(mtxOutcomeTx)))]
-    }
-
-    colnames(tblOutcomeTx)[c(1:length(colnames(mtxOutcomeTx)))] <- colnames(mtxOutcomeTx)
-
-    tblOutcomeTx$nOutcome <- rowSums(tblOutcomeTx)
-
-    tblOutcomeTx$patternOutcome <- NA
-
-    for (outcome.i in c(1:(length(tblOutcomeTx)-2))) {
-      if (outcome.i == 1) {
-        tblOutcomeTx[, "patternOutcome"] <- tblOutcomeTx[, outcome.i]
-      } else {
-        tblOutcomeTx[, "patternOutcome"] <- paste(tblOutcomeTx[, "patternOutcome"],
-                                                  tblOutcomeTx[, outcome.i],
-                                                  sep = "")
+      for (tx.i in c(1:nrow(tblOutcomeTx))) {
+        tblOutcomeTx[tx.i, c(2:length(colnames(mtxOutcomeTx)))] <- mtxOutcomeTx[tx.i, c(2:length(colnames(mtxOutcomeTx)))]
       }
-    }
 
-    tblOutcomeTx$Patterns <- NA
+      colnames(tblOutcomeTx)[c(1:length(colnames(mtxOutcomeTx)))] <- colnames(mtxOutcomeTx)
 
-    for (outcome.i in c(1:nrow(tblOutcomeTx))) {
-      pattern <- which(names(table(tblOutcomeTx$patternOutcome)) == tblOutcomeTx[outcome.i, "patternOutcome"])
-      #tblOutcomeTx[outcome.i, "nPattern"] <- table(tblOutcomeTx$patternOutcome)[[pattern]]
-      tblOutcomeTx[outcome.i, "Patterns"] <- pattern
-    }
+      tblOutcomeTx$nOutcome <- rowSums(tblOutcomeTx)
 
+      tblOutcomeTx$patternOutcome <- NA
 
-    tblOutcomeTx$pattern <- NA
-
-    for (tx.i in c(1:nrow(tblOutcomeTx))) {
-      outcomeTx <- which(tblOutcomeTx[tx.i, c(1:(length(tblOutcomeTx) - 3))] == 1)
-
-      for (outcome.i in outcomeTx) {
-        if (outcome.i == outcomeTx[1]) {
-          tblOutcomeTx[tx.i, "pattern"] <- colnames(tblOutcomeTx)[outcome.i]
+      for (outcome.i in c(1:(length(tblOutcomeTx)-2))) {
+        if (outcome.i == 1) {
+          tblOutcomeTx[, "patternOutcome"] <- tblOutcomeTx[, outcome.i]
         } else {
-          tblOutcomeTx[tx.i, "pattern"] <- paste(tblOutcomeTx[tx.i, "pattern"],
-                                                 colnames(tblOutcomeTx)[outcome.i],
-                                                 sep = ", ")
+          tblOutcomeTx[, "patternOutcome"] <- paste(tblOutcomeTx[, "patternOutcome"],
+                                                    tblOutcomeTx[, outcome.i],
+                                                    sep = "")
         }
       }
+
+      tblOutcomeTx$Patterns <- NA
+
+      for (outcome.i in c(1:nrow(tblOutcomeTx))) {
+        pattern <- which(names(table(tblOutcomeTx$patternOutcome)) == tblOutcomeTx[outcome.i, "patternOutcome"])
+        #tblOutcomeTx[outcome.i, "nPattern"] <- table(tblOutcomeTx$patternOutcome)[[pattern]]
+        tblOutcomeTx[outcome.i, "Patterns"] <- pattern
+      }
+
+
+      tblOutcomeTx$pattern <- NA
+
+      for (tx.i in c(1:nrow(tblOutcomeTx))) {
+        outcomeTx <- which(tblOutcomeTx[tx.i, c(1:(length(tblOutcomeTx) - 3))] == 1)
+
+        for (outcome.i in outcomeTx) {
+          if (outcome.i == outcomeTx[1]) {
+            tblOutcomeTx[tx.i, "pattern"] <- colnames(tblOutcomeTx)[outcome.i]
+          } else {
+            tblOutcomeTx[tx.i, "pattern"] <- paste(tblOutcomeTx[tx.i, "pattern"],
+                                                   colnames(tblOutcomeTx)[outcome.i],
+                                                   sep = ", ")
+          }
+        }
+      }
+
+      tblOutcomeTx <- tblOutcomeTx[, -c(1:(length(mtxOutcomeTx) / nrow(mtxOutcomeTx)), which(colnames(tblOutcomeTx) == "patternOutcome"))]
     }
 
-    tblOutcomeTx <- tblOutcomeTx[, -c(1:(length(mtxOutcomeTx) / nrow(mtxOutcomeTx)), which(colnames(tblOutcomeTx) == "patternOutcome"))]
   }
 
 
@@ -358,9 +376,11 @@ SetMetrics <- function(data,
   class(dataList)       <- "rankinma"
   dataList$data         <- dataSet
   dataList$data.sets    <- split(dataSet, dataSet$outcome)
-  if (metrics.name != "Probabilities") {
-    dataList$ptrn.tx      <- tblTxOutcome
-    dataList$ptrn.outcome <- tblOutcomeTx
+  if (infoOutcomes > 1) {
+    if (metrics.name != "Probabilities") {
+      dataList$ptrn.tx      <- tblTxOutcome
+      dataList$ptrn.outcome <- tblOutcomeTx
+    }
   }
   dataList$color.txs    <- colorTx
   dataList$trans        <- trans
@@ -403,7 +423,7 @@ SetMetrics <- function(data,
 #' @return
 #' **ShowColor()** show a plot of color for each treatment.
 #'
-#' @export ShowColor
+#' @noRd
 ShowColor <- function(data) {
 
   dataColor  <- data$color.txs

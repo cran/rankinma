@@ -1,21 +1,21 @@
 #' @title Illustrate line chart of treatment ranking metrics
 #'
-#' @author Enoch Kang
-#'
 #' @description
 #' **PlotLine()** is a function for illustrating line chart in both simple
 #' and composite styles.
 #'
-#' @param data DATA of metrics for treatment ranking.
-#' @param accum LOGIC value for indicating whether use accumulative probabilities.
-#'        This parameter is only for probabilities but not global metrics of
-#'        treatment ranking.
-#' @param compo LOGIC value for indicating whether use composite line chart.
-#'        This parameter is only for probabilities but not global metrics of
-#'        treatment ranking.
-#' @param merge LOGIC value for indicating whether merge line charts together.
-#' @param color LIST of colors for treatments in a network meta-analysis,
-#'        or CHARACTER of a color for the line on not composite line chart.
+#' @param data    DATA of metrics for treatment ranking.
+#' @param accum   LOGIC value for indicating whether use accumulative probabilities.
+#'                This parameter is only for probabilities but not global metrics
+#'                of treatment ranking.
+#' @param compo   LOGIC value for indicating whether use composite line chart.
+#'                This parameter is only for probabilities but not global metrics
+#'                of treatment ranking.
+#' @param merge   LOGIC value for indicating whether merge line charts together.
+#' @param color   LIST of colors for treatments in a network meta-analysis,
+#'                or CHARACTER of a color for the line on not composite line chart.
+#' @param rotateX NUMERIC value between 0 and 360 for rotating x axis labels of
+#'                line chart.
 #'
 #' @return
 #' **PlotLine()** returns a line chart.
@@ -51,14 +51,41 @@
 #' @export PlotLine
 
 PlotLine <- function(data,
-                     accum = NULL,
-                     compo = NULL,
-                     merge = NULL,
-                     color = NULL) {
+                     accum   = NULL,
+                     compo   = NULL,
+                     merge   = NULL,
+                     color   = NULL,
+                     rotateX = NULL) {
 
-  dataLine <- data$data
+
+  # 01. CHECK core arguments -----
+
+  lgcInher  <- !inherits(data, "rankinma")
+
+  if (lgcInher) {
+    infoLgcInher <- paste(" Inherit: ERROR\n",
+                          ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
+  } else {
+    infoLgcInher <- paste(" Inherit: OK")
+  }
+
+
+
+  # 02. RETURN results of core argument checking  -----
+
+  if (lgcInher)
+
+    stop(infoLgcInher)
+
+
+  # 03. DEFINE core data -----
+
+  dataLine  <- data$data
 
   lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score")
+
+  txs       <- unique(dataLine$tx)
+  outcomes  <- unique(dataLine$outcome)
 
   argAccum  <- ifelse(is.null(accum), FALSE,
                       ifelse(accum == FALSE, FALSE,
@@ -102,7 +129,8 @@ PlotLine <- function(data,
   }
 
 
-  lgcInher  <- !inherits(data, "rankinma")
+
+  # 04. CHECK additive arguments -----
 
   lgcAccum  <- ifelse(argAccum == TRUE,
                       ifelse(data$metrics.name != "Probabilities",
@@ -126,14 +154,16 @@ PlotLine <- function(data,
                                     ifelse(length(color) != 1, TRUE, FALSE)),
                              ifelse(length(color) != 1, TRUE, FALSE)))
 
-  # 02 REPORT results from argument checking -----
+  lgcRotateX <- ifelse(is.null(rotateX),
+                       FALSE,
+                       ifelse(isFALSE(length(rotateX) == 1),
+                              TRUE,
+                              ifelse(rotateX < 0 | rotateX > 360,
+                                     TRUE, FALSE)))
 
-    if (lgcInher) {
-      infoLgcInher <- paste(" Inherit: ERROR\n",
-              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
-  } else {
-    infoLgcInher <- paste(" Inherit: OK")
-  }
+
+
+  # 05 REPORT results from argument checking -----
 
   if (lgcCompo) {
     infoLgcCompo <- paste(" Composite: WARNING!\n",
@@ -181,29 +211,59 @@ PlotLine <- function(data,
     infoLgcColor <- paste(" Color: OK")
   }
 
+  if (lgcRotateX) {
+    infoLgcRotateX <- paste(" RotateX: WARNING!\n",
+                            ' INFORM: Argument "rotateX" should be a numeric value
+                            between 0 and 360, and *rankinma* is producing x axis
+                            labels of line chart with default argument in terms of
+                            `rotateX = 0` now.')
+  } else {
+    infoLgcRotateX <- paste(" RotateX: OK")
+  }
+
 
   infoStop <- paste(infoLgcInher, "\n",
                     infoLgcCompo, "\n",
                     infoLgcMerge, "\n",
                     infoLgcColor, "\n",
+                    infoLgcRotateX, "\n",
                     sep = ""
                     )
 
   if (lgcInher | lgcColor)
     stop(infoStop)
 
-  txs      <- unique(dataLine$tx)
-  outcomes <- unique(dataLine$outcome)
+
+
+  # 06 PROCESS additive setting -----
+
+  infoRotateX <- ifelse(max(nchar(txs)) > 10, 30, 0)
+  argRotateX  <- ifelse(is.null(rotateX),
+                        infoRotateX,
+                        ifelse(isFALSE(length(rotateX) == 1),
+                               infoRotateX,
+                               ifelse(rotateX >= 0 & rotateX <= 360,
+                                      rotateX, infoRotateX)))
+  argPosX     <- ifelse(argRotateX == 0, 4, 2)
+
+
+
+  # 07 PLOT line chart -----
 
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
 
   if (data$metrics.name == "Probabilities") {
-    # 3.1. Ranking with probabilities -----
+    # 7.1. Ranking with probabilities -----
 
     argPlotRow <- ceiling((data$n.tx)/3)
-    argPlotClm <- ifelse((data$n.tx) < 3,
-                         (data$n.tx), 3)
+    argPlotClm <- ifelse(data$n.tx < 3,
+                         data$n.tx,
+                         ifelse(data$n.tx == 4, 2, 3)
+                         )
+
+    #argPlotClm <- ifelse((data$n.tx) < 3,
+    #                     (data$n.tx), 3)
 
     #cat(paste("This function is developing..."),
     #    fill = TRUE, sep = "")
@@ -211,7 +271,7 @@ PlotLine <- function(data,
     #    fill = TRUE, sep = "")
 
     if (argAccum == TRUE) {
-      # 3.1.1. Cumulative probabilities -----
+      # 7.1.1. Cumulative probabilities -----
 
       infoColumnCum <- which(substr(colnames(dataLine),
                                     nchar(colnames(dataLine)) - 2,
@@ -221,7 +281,7 @@ PlotLine <- function(data,
       colnames(dataLineCum)[c(7:length(dataLineCum))] <- dataLineCum$tx
 
       if (argCompo == TRUE) {
-        # 3.1.1.1. Composite line chart (cumulative probabilities) -----
+        # 7.1.1.1. Composite line chart (cumulative probabilities) -----
 
         par(mar = c(5, 5, 5, 7), xpd = TRUE)
         for (outcome.i in c(1:length(outcomes))) {
@@ -232,19 +292,29 @@ PlotLine <- function(data,
                cex.names = 0.8,
                cex.axis = 0.8,
                xlim = c(1, max(dataLinePlot$txs)),
-               ylim = c(0, 1),
+               ylim = c(-0.1, 1.1),
                xaxt = "n",
                yaxt = "n",
                xlab = "Rank",
                ylab = "Cumulative probability",
                col = if (is.null(argColor)) {
                  c(dataLinePlot$colorTx[1])
-               } else {
-                 argColor[1]
-               },
+                 } else {
+                   argColor[1]
+                 },
                legend = FALSE, frame.plot = FALSE)
-          axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-          title(paste("Composite line chart of cumulative probability on ",
+
+          axis(side = 1,
+               cex.axis = ifelse(max(dataLinePlot$txs) > 10,
+                                 1 / max(dataLinePlot$txs) * 10,
+                                 1),
+               at = c(1:max(dataLinePlot$txs)),
+               labels = dataLinePlot$txs)
+
+          axis(side = 2, cex.axis = 0.8,
+               at = seq(0, 1, by = 0.2),
+               las = 1)
+          title(paste("Composite line chart of cumulative probability on \n",
                       data$ls.outcome[outcome.i], sep = ""),
                 cex.main = 1, font = 1, line = 0.5)
 
@@ -258,10 +328,6 @@ PlotLine <- function(data,
                   }
             )
           }
-
-          axis(side = 1, cex.axis = 0.8,
-               at = c(1:max(dataLinePlot$txs)),
-               labels = dataLinePlot$txs)
 
           segments(rep(data$n.tx * 1.01, nrow(dataLinePlot)),
                    (0.95) / nrow(dataLinePlot) * dataLinePlot$txs,
@@ -280,12 +346,12 @@ PlotLine <- function(data,
                pos = 4,
                cex = 0.8)
 
-          plotTemp <-  grDevices::recordPlot()
+          plotTemp <- grDevices::recordPlot()
         }
 
 
       } else if (argMerge == TRUE) {
-          # 3.1.1.2. Merged line charts (cumulative probabilities) -----
+          # 7.1.1.2. Merged line charts (cumulative probabilities) -----
 
           par(mfrow = c(argPlotRow, argPlotClm),
               oma = c(4,4,4,0.5),
@@ -301,9 +367,10 @@ PlotLine <- function(data,
                  cex.names = 0.8,
                  cex.axis = 0.8,
                  xlim = c(1, max(dataLinePlot$txs)),
-                 ylim = c(0, 1),
+                 ylim = c(-0.1, 1.1),
                  xaxt = "n", yaxt = "n",
-                 xlab = "Rank", ylab = "Probabilities",
+                 #xlab = "Rank", ylab = "Probabilities",
+                 xlab = "", ylab = "",
                  legend = FALSE,
                  frame.plot = FALSE,
                  #col = ifelse(is.null(argColor), "dodgerblue3", argColor)
@@ -313,11 +380,16 @@ PlotLine <- function(data,
                    ifelse(is.null(argColor), "dodgerblue3", argColor[1])
                  }
             )
-            axis(side = 1, cex.axis = 0.8,
+            axis(side = 1,
+                 cex.axis = ifelse(max(dataLinePlot$txs) > 10,
+                                   1 / max(dataLinePlot$txs) * 10,
+                                   1),
                  at = c(1:max(dataLinePlot$txs)),
                  labels = dataLinePlot$txs)
+
             axis(side = 2, cex.axis = 0.8,
-                 at = seq(0, 1, by = 0.1), las = 1)
+                 at = seq(0, 1, by = 0.2),
+                 las = 1)
             title(paste(colnames(dataLinePlot)[tx.i], sep = ""),
                   cex.main = 1, font = 1, line = 0.5)
           }
@@ -335,7 +407,7 @@ PlotLine <- function(data,
                 side = 1, font = 1, line = 1, outer = TRUE)
           par(mfrow = c(1,1))
         } else {
-        # 3.1.1.3. separated line charts (cumulative probabilities) -----
+        # 7.1.1.3. separated line charts (cumulative probabilities) -----
         par(mar = c(5, 5, 5, 7), xpd = TRUE)
         for (outcome.i in c(1:length(outcomes))) {
           for (tx.i in c(7:(6 + data$n.tx))) {
@@ -346,24 +418,32 @@ PlotLine <- function(data,
                  cex.names = 0.8,
                  cex.axis = 0.8,
                  xlim = c(1, max(dataLinePlot$txs)),
-                 ylim = c(0, 1),
+                 ylim = c(-0.1, 1.1),
                  xaxt = "n", yaxt = "n",
                  xlab = "Rank", ylab = "Cumulative probability",
                  legend = FALSE,
                  frame.plot = FALSE,
                  col = ifelse(is.null(argColor), "dodgerblue3", argColor)
             )
-            axis(side = 1, cex.axis = 0.8,
+
+            axis(side = 1,
+                 cex.axis = ifelse(max(dataLinePlot$txs) > 10,
+                                   1 / max(dataLinePlot$txs) * 10,
+                                   1),
                  at = c(1:max(dataLinePlot$txs)),
                  labels = dataLinePlot$txs)
-            axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-            title(paste("Line chart for cumulative probability of\n",
-                        data$ls.tx[tx.i - 6], " on ",
+
+            axis(side = 2, cex.axis = 0.8,
+                 at = seq(0, 1, by = 0.2),
+                 las = 1)
+
+            title(paste("Line chart for cumulative probability of \n",
+                        data$ls.tx[tx.i - 6], " on \n",
                         data$ls.outcome[outcome.i],
                         sep = ""),
                   cex.main = 0.8, font = 1, line = 0.5)
 
-            plotTemp <-  grDevices::recordPlot()
+            plotTemp <- grDevices::recordPlot()
           }
 
         }
@@ -376,8 +456,8 @@ PlotLine <- function(data,
       colnames(dataLineProb)[c(7:length(dataLineProb))] <- dataLineProb$tx
 
       if (argCompo == TRUE) {
-        # 3.1.2. Probabilities of ranks -----
-        # 3.1.2.1. Composite line chart (probabilities) -----
+        # 7.1.2. Probabilities of ranks -----
+        # 7.1.2.1. Composite line chart (probabilities) -----
 
       par(mar = c(5, 5, 5, 7), xpd = TRUE)
       for (outcome.i in c(1:length(outcomes))) {
@@ -388,19 +468,31 @@ PlotLine <- function(data,
              cex.names = 0.8,
              cex.axis = 0.8,
              xlim = c(1, max(dataLinePlot$txs)),
-             ylim = c(0, 1),
+             ylim = c(-0.1, 1.1),
              xaxt = "n",
              yaxt = "n",
              xlab = "Rank",
              ylab = "Probability",
              col = if (is.null(argColor)) {
                c(dataLinePlot$colorTx[1])
-             } else {
-               argColor[1]
-             },
-             legend = FALSE, frame.plot = FALSE)
-        axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-        title(paste("Composite line chart of rank probability on ",
+               } else {
+                 argColor[1]
+               },
+             legend = FALSE, frame.plot = FALSE
+             )
+
+        axis(side = 1,
+             cex.axis = ifelse(max(dataLinePlot$txs) > 10,
+                               1 / max(dataLinePlot$txs) * 10,
+                               1),
+             at = c(1:max(dataLinePlot$txs)),
+             labels = dataLinePlot$txs)
+
+        axis(side = 2, cex.axis = 0.8,
+             at = seq(0, 1, by = 0.2),
+             las = 1)
+
+        title(paste("Composite line chart of rank probability on \n",
                     data$ls.outcome[outcome.i], sep = ""),
               cex.main = 1, font = 1, line = 0.5)
 
@@ -409,15 +501,11 @@ PlotLine <- function(data,
                 dataLinePlot[, c(tx.i)],
                 col = if (is.null(argColor)) {
                   c(dataLinePlot$colorTx[tx.i - 6])
-                } else {
-                  argColor[tx.i - 6]
-                }
-          )
-        }
-
-        axis(side = 1, cex.axis = 0.8,
-             at = c(1:max(dataLinePlot$txs)),
-             labels = dataLinePlot$txs)
+                  } else {
+                    argColor[tx.i - 6]
+                  }
+                )
+          }
 
         segments(rep(data$n.tx * 1.01, nrow(dataLinePlot)),
                  (0.95) / nrow(dataLinePlot) * dataLinePlot$txs,
@@ -426,9 +514,9 @@ PlotLine <- function(data,
                  lwd = 2,
                  col = if (is.null(argColor)) {
                    c(dataLinePlot$colorTx)
-                 } else {
-                   argColor}
-        )
+                   } else {
+                     argColor}
+                 )
 
         text(rep(data$n.tx * 1.06, nrow(dataLinePlot)),
              (0.95) / nrow(dataLinePlot) * dataLinePlot$txs,
@@ -436,12 +524,12 @@ PlotLine <- function(data,
              pos = 4,
              cex = 0.8)
 
-        plotTemp <-  grDevices::recordPlot()
+        plotTemp <- grDevices::recordPlot()
       }
       par(mar = c(5, 5, 5, 5), xpd = TRUE)
 
     } else if (argMerge == TRUE) {
-      # 3.1.2.2. Merged line charts (probabilities) -----
+      # 7.1.2.2. Merged line charts (probabilities) -----
       par(mfrow = c(argPlotRow, argPlotClm),
           oma = c(4,4,4,0.5),
           mai = c(0.3,0.3,0.3,0.3))
@@ -456,9 +544,10 @@ PlotLine <- function(data,
              cex.names = 0.8,
              cex.axis = 0.8,
              xlim = c(1, max(dataLinePlot$txs)),
-             ylim = c(0, 1),
+             ylim = c(-0.1, 1.1),
              xaxt = "n", yaxt = "n",
-             xlab = "Rank", ylab = "Probabilities",
+             #xlab = "Rank", ylab = "Probabilities",
+             xlab = "", ylab = "",
              legend = FALSE,
              frame.plot = FALSE,
              #col = ifelse(is.null(argColor), "dodgerblue3", argColor)
@@ -469,16 +558,20 @@ PlotLine <- function(data,
              }
              )
 
-        axis(side = 1, cex.axis = 0.8,
+        axis(side = 1,
+             cex.axis = ifelse(max(dataLinePlot$txs) > 10,
+                               1 / max(dataLinePlot$txs) * 10,
+                               1),
              at = c(1:max(dataLinePlot$txs)),
              labels = dataLinePlot$txs)
+
         axis(side = 2, cex.axis = 0.8,
              at = seq(0, 1, by = 0.1), las = 1)
         title(paste(colnames(dataLinePlot)[tx.i], sep = ""),
               cex.main = 1, font = 1, line = 0.5)
       }
 
-      mtext(paste("Line chart of " ,
+      mtext(paste("Line chart of ",
                   ifelse(data$metrics.name %in% lsMetrics,
                          data$metrics.name, "???"),
                   " on\n",
@@ -489,10 +582,10 @@ PlotLine <- function(data,
             side = 2, font = 1, line = 1, outer = TRUE)
       mtext("Rank",
             side = 1, font = 1, line = 1, outer = TRUE)
-      par(mfrow=c(1,1))
+      par(mfrow = c(1,1))
 
     } else {
-      # 3.1.2.3. Separated line charts (probabilities) -----
+      # 7.1.2.3. Separated line charts (probabilities) -----
 
       par(mar = c(5, 5, 5, 5), xpd = TRUE)
 
@@ -505,37 +598,44 @@ PlotLine <- function(data,
                cex.names = 0.8,
                cex.axis = 0.8,
                xlim = c(1, max(dataLinePlot$txs)),
-               ylim = c(0, 1),
+               ylim = c(-0.1, 1.1),
                xaxt = "n", yaxt = "n",
                xlab = "Rank", ylab = "Probabilities",
                legend = FALSE,
                frame.plot = FALSE,
                col = ifelse(is.null(argColor), "dodgerblue3", argColor)
           )
-          axis(side = 1, cex.axis = 0.8,
+
+          axis(side = 1,
+               cex.axis = ifelse(max(dataLinePlot$txs) > 10,
+                                 1 / max(dataLinePlot$txs) * 10,
+                                 1),
                at = c(1:max(dataLinePlot$txs)),
                labels = dataLinePlot$txs)
-          axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
+
+          axis(side = 2, cex.axis = 0.8,
+               at = seq(0, 1, by = 0.2), las = 1)
+
           title(paste("Line chart for rank probability of\n",
                       data$ls.tx[tx.i - 6], " on ",
                       data$ls.outcome[outcome.i],
                       sep = ""),
                 cex.main = 0.8, font = 1, line = 0.5)
 
-          plotTemp <-  grDevices::recordPlot()
+          plotTemp <- grDevices::recordPlot()
         }
       }
     }
   }
 
   } else {
-    # 3.2. Global metrics -----
+    # 7.2. Global metrics -----
     argPlotRow <- ceiling((data$n.outcome)/3)
     argPlotClm <- ifelse((data$n.outcome) < 3,
                          (data$n.outcome), 3)
 
     if (argMerge == TRUE) {
-      # 3.2.1. Merged line chart (global metrics) -----
+      # 7.2.1. Merged line chart (global metrics) -----
 
       par(mfrow = c(argPlotRow, argPlotClm),
           oma = c(4,4,4,0.5),
@@ -554,9 +654,10 @@ PlotLine <- function(data,
              cex.names = 0.8,
              cex.axis = 0.8,
              xlim = c(1, max(dataLinePlot$seq.tx)),
-             ylim = c(0, 1),
+             ylim = c(-0.2, 1.2),
              xaxt = "n", yaxt = "n",
-             xlab = "Treatment", ylab = data$metrics.name,
+             #xlab = "Treatment", ylab = data$metrics.name,
+             xlab = "", ylab = "",
              legend = FALSE,
              frame.plot = FALSE,
              #col = ifelse(is.null(argColor), "dodgerblue3", argColor)
@@ -567,11 +668,23 @@ PlotLine <- function(data,
                }
              )
 
-        axis(side = 1, cex.axis = 0.8,
-             at = c(1:max(dataLinePlot$seq.tx)),
-             labels = dataLinePlot$tx)
+        #axis(side = 1, cex.axis = 0.8,
+        #     at = c(1:max(dataLinePlot$seq.tx)),
+        #     labels = dataLinePlot$tx)
+
+        text(c(1:nrow(dataLinePlot)),
+             rep(-0.1, nrow(dataLinePlot)),
+             #par("usr")[3],
+             dataLinePlot$tx,
+             cex = ifelse(max(nchar(dataLinePlot$tx)) > 10,
+                          1 / max(nchar(dataLinePlot$tx)) * 10,
+                          1),
+             col = "black",
+             xpd = TRUE, pos = argPosX, srt = argRotateX)
+
         axis(side = 2, cex.axis = 0.8,
-             at = seq(0, 1, by = 0.1), las = 1)
+             at = seq(0, 1, by = 0.2),
+             las = 1)
         title(paste(data$ls.outcome[outcome.i], sep = ""),
               cex.main = 1, font = 1, line = 0.5)
       }
@@ -585,10 +698,10 @@ PlotLine <- function(data,
             side = 2, font = 1, line = 1, outer = TRUE)
       mtext("Treatment",
             side = 1, font = 1, line = 1, outer = TRUE)
-      par(mfrow=c(1,1))
+      par(mfrow = c(1,1))
 
     } else {
-      # 3.2.2. Separated line charts (global metrics) -----
+      # 7.2.2. Separated line charts (global metrics) -----
 
       par(mar = c(5, 5, 5, 7), xpd = TRUE)
 
@@ -596,6 +709,7 @@ PlotLine <- function(data,
         dataLinePlot <- dataLine[dataLine$outcomes == outcome.i, ]
 
         dataLinePlot <- dataLinePlot[order(-dataLinePlot$txs),]
+        dataLinePlot <- dataLinePlot[order(dataLinePlot$metrics, decreasing = TRUE), ]
         dataLinePlot$seq.tx <- c(1:nrow(dataLinePlot))
 
         plot(dataLinePlot[, "metrics"],
@@ -603,16 +717,31 @@ PlotLine <- function(data,
              cex.names = 0.8,
              cex.axis = 0.8,
              xlim = c(1, max(dataLinePlot$seq.tx)),
-             ylim = c(0, 1),
+             ylim = c(-0.2, 1.2),
              xaxt = "n", xlab = "Treatment",
              yaxt = "n", ylab = data$metrics.name,
              col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]),
              legend = FALSE, frame.plot = FALSE)
-        axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-        axis(side = 1, cex.axis = 0.8,
-             at = dataLinePlot[, "seq.tx"],
-             labels = dataLinePlot[, "tx"])
-        title(paste("Line chart of ", data$metrics.name, " on ",
+        #axis(side = 1, cex.axis = 0.8,
+        #     at = dataLinePlot[, "seq.tx"],
+        #     labels = dataLinePlot[, "tx"])
+        text(c(1:nrow(dataLinePlot)),
+             rep(-0.1, nrow(dataLinePlot)),
+             #par("usr")[3],
+             dataLinePlot$tx,
+             cex = ifelse(max(nchar(dataLinePlot$tx)) > 10,
+                          1 / max(nchar(dataLinePlot$tx)) * 10,
+                          1),
+             col = "black",
+             xpd = TRUE, pos = argPosX, srt = argRotateX)
+        axis(side = 2, cex.axis = 0.8,
+             at = seq(0, 1, by = 0.2),
+             las = 1)
+        #mtext(ifelse(data$metrics.name %in% lsMetrics,data$metrics.name, "???"),
+        #      side = 2, font = 1, line = 1,
+              #adj = ifelse(argPlotRow == 1, 0.65, 0.5),
+        #      outer = TRUE)
+        title(paste("Line chart of ", data$metrics.name, " on \n",
                     outcomes[outcome.i], sep = ""),
               cex.main = 1, font = 1, line = 0.5)
 
@@ -623,4 +752,3 @@ PlotLine <- function(data,
   }
 
 }
-

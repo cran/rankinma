@@ -32,6 +32,18 @@ ranking curve or P-score.}
 \value{
 \strong{SetMetrics()} returns a confirmed data.frame of treatment, metrics of
 treatment ranking, and outcome name.
+\item{metrics.name}{A string shows type of metrics of treatment ranking.}
+\item{ls.outcome}{Strings list outcomes.}
+\item{ls.tx}{Strings list treatments.}
+\item{n.outcome}{An integer shows numbers of outcomes.}
+\item{n.tx}{An integer shows numbers of treatments.}
+\item{data}{A data frame consists of seven columns of core information among
+all outcomes.}
+\item{data.sets}{A list shows data frame of core information by each outcome.}
+\item{ptrn.tx}{A data frame shows treatments on each outcome.}
+\item{ptrn.outcome}{A data frame shows outcomes by treatments.}
+\item{color.txs}{A data frame shows color of each treatment.}
+\item{trans}{A numeric value shows transparency for colors of each treatment.}
 }
 \description{
 \strong{SetMetrics()} is a function for checking and preparing data set of metrics
@@ -61,7 +73,4 @@ for further ploting in \emph{rankinma}.
 }
 \seealso{
 \code{\link{GetMetrics}}
-}
-\author{
-Enoch Kang
 }

@@ -1,7 +1,5 @@
 #' @title Illustrate beading plot
 #'
-#' @author Enoch Kang
-#'
 #' @description
 #' **PlotSpie()** is a function for illustrating spie plot.
 #'

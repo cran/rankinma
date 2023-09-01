@@ -1,6 +1,43 @@
 # Change of package `rankinma`
 
 
+## rankinma 0.1.9
+### Date: August 31, 2023
+
+**Modify document:** improve *rankinma* package README file.
+\
+
+### Date: August 20, 2023
+
+**Modify document:** improve *rankinma* package manual by detailing returned values from function `SetMetrics()`.
+\
+
+### Date: August 08, 2023
+
+**Modify document:** improve *rankinma* package manual by displaying description and details.
+\
+
+**Modify function:** improve function `GetMetrics()` in order to get SUCRA consistently and reproducibly.
+\
+
+### Date: July 31, 2023
+
+**Modify function:** improve function `PlotBeads()` with newly added parameter `szPnt`, `szFntTtl`, `szFntTtlX`, `szFntX`, `szFntY`, and `szFntLgnd` for allowing user to change size of beads, font size of main title for beading plot, font size of title on X-axis, font size of numeric scale on X-axis, font size of outcome name(s), and legend font size. Minor modification was also done for sorting legend by alphabet.
+\
+
+**Modify function:** improve function `PlotHeat()` with a newly added parameter `szFntY` for allowing user to change font size of outcome name(s).
+\
+
+### Date: July 30, 2023
+
+**Modify function:** improve function `PlotLine()` and `PlotBar()` to illustrate line chart or bar chart according to descending order of global metrics of treatment ranking on single outcome.
+\
+
+**Modify function:** improve function `PlotLine()`, `PlotBar()`, and `PlotHeat()` with a newly added parameter `rotateX` in order to rotate labels on x-axis.
+\
+
+
+
 ## rankinma 0.1.8
 ### Date: July 03, 2023
 
@@ -123,37 +160,5 @@ Build rankinma with first two functions including `SetMetrics()` and `PlotBeads(
 > 1. `SetMetrics()` is to set imported data in *rankinma* format.
 >
 > 2. `PlotBeads()` is to illustrate beading plot using object of class *rankinma* set by function `SetMetrics()`.
->
->
-
-\
-
-
-### Writing style of *rankinma* (January 29, 2023)
-
-This package is written according to Google's R style. For readers, details of naming rules are listed as follows:
-
-> 1. **.R file** is named using lower case with underscore "_" between words (*e.g. get_metrics.R*). 
->
-> 2. **function** is named using verb or verb with noun, and the first character of each word is written in capital letter (e.g. `GetMetrics()`).
->
-> 3. **object** is named using noun with the first word in lower case, but the first character of rest words is written using capital letter (e.g. `argOutcome`).
->
-> 4. **variable** is named using noun written in lower case. Words of variable name are separated by "." if a variable name consists of more than two words (e.g. `data$metrics.name`).
->
->
-
-\
-
-
-### Version numbering rule of *rankinma* (October 30, 2023)
-
-version number consists of three integers with a period between them (eg. version 1.0.0).
-
-> 1. Updating the first integer refers to a modification with new methodological impact. 
->
-> 2. Changing the second integer refers to an update with a new function without new methodological impact. 
->
-> 3. Updating the third integer refers to a modification in a function.
 >
 >

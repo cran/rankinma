@@ -69,6 +69,3 @@ meta-analysis: an overview and tutorial. \strong{Journal of clinical epidemiolog
 \seealso{
 \code{\link{SetMetrics}}
 }
-\author{
-Enoch Kang
-}

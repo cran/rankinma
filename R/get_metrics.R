@@ -1,7 +1,5 @@
 #' @title Get treatment ranking metrics from network meta-analysis output
 #'
-#' @author Enoch Kang
-#'
 #' @description
 #' **GetMetrics()** is a function for gathering metrics of treatment ranking
 #' from *netmeta* output.
@@ -80,6 +78,9 @@ GetMetrics <- function(data,
   lgcMetrics <- !(argMetrics %in% lsMetrics)
   lgcModel   <- isTRUE(argModel == "unspecified")
 
+  infoLgcWarning <- getOption("warn")
+  options(warn = -1)
+  on.exit(options(warn = infoLgcWarning))
 
   # 02 REPORT results from argument checking -----
 
@@ -133,14 +134,53 @@ GetMetrics <- function(data,
     stop(infoStop)
 
 
+
   # 03 GET treatment ranking metrics from object of *netmeta* class -----
   ## 03.1 GET probabilities from object of *netmeta* class -----
 
+  infoSeedOld <- set.seed(NULL)
+  on.exit(set.seed(infoSeedOld))
+
+  if (argModel == "random") {
+    set.seed(101020)
+    outRankogram <- netmeta::rankogram(data, nsim = simt,
+                                       random = TRUE,
+                                       small.values = argPrefer)
+
+    vctPbest     <- outRankogram$ranking.matrix.random[, 1]
+
+    set.seed(101020)
+    vctPscore    <- netmeta::netrank(data, method = "P-score",
+                                     random = TRUE,
+                                     small.values = argPrefer)$ranking.random
+
+    set.seed(101020)
+    vctSUCRA     <- netmeta::netrank(data, method = "SUCRA",
+                                     random = TRUE,
+                                     small.values = argPrefer)$ranking.random
+
+  } else {
+    set.seed(101020)
+    outRankogram <- netmeta::rankogram(data, nsim = simt,
+                                       random = FALSE,
+                                       small.values = argPrefer)
+
+    vctPbest     <- outRankogram$ranking.matrix.common[, 1]
+
+    set.seed(101020)
+    vctPscore    <- netmeta::netrank(data, method = "P-score",
+                                     common = TRUE,
+                                     small.values = argPrefer)$ranking.common
+
+    set.seed(101020)
+    vctSUCRA     <- netmeta::netrank(data, method = "SUCRA",
+                                     common = TRUE,
+                                     small.values = argPrefer)$ranking.common
+
+  }
+
+
   if (argMetrics == "Probabilities") {
-    if (argModel == "random") {
-      outRankogram <- netmeta::rankogram(data, nsim = simt,
-                                           random = TRUE,
-                                           small.values = argPrefer)
       dataGetProb  <- as.data.frame(t(outRankogram$ranking.matrix.random))
 
       colnames(dataGetProb) <- paste(colnames(dataGetProb),
@@ -157,99 +197,36 @@ GetMetrics <- function(data,
       #dataGetProbCum$rank <- seq(1:length(dataGetProbCum))
       dataGet <- cbind(dataGetProb, dataGetProbCum)
 
-    } else if (argModel == "common") {
-      outRankogram <- netmeta::rankogram(data, nsim = simt,
-                                           random = FALSE,
-                                           small.values = argPrefer)
-      dataGetProb  <- as.data.frame(t(outRankogram$ranking.matrix.common))
-      colnames(dataGetProb) <- paste(colnames(dataGetProb),
-                                     rep("Prob",
-                                         length(dataGetProb)),
-                                     sep = "")
-
-      dataGetProbCum <- as.data.frame(t(outRankogram$cumrank.matrix.common))
-      colnames(dataGetProbCum) <- paste(colnames(dataGetProbCum),
-                                        rep("Cum",
-                                            length(dataGetProbCum)),
-                                        sep = "")
-
-      #dataGetProbCum$rank <- seq(1:length(dataGetProbCum))
-      dataGet <- cbind(dataGetProb, dataGetProbCum)
-    }
   }
 
 
   ## 03.2 GET P-best from object of *netmeta* class -----
 
   if (argMetrics == "P-best") {
-    if (argModel == "random") {
-      dataGet <- as.data.frame(
-        netmeta::rankogram(data, nsim = simt, random = TRUE,
-                           small.values = argPrefer)$ranking.matrix.random[, 1])
-    } else if (argModel == "common"){
-      dataGet <- as.data.frame(
-        netmeta::rankogram(data,nsim = simt, random = FALSE,
-                           small.values = argPrefer)$ranking.matrix.common[, 1])
-    }
+      dataGet <- as.data.frame(vctPbest)
   }
 
 
   ## 03.3 GET SUCRA from object of *netmeta* class -----
 
   if (argMetrics == "SUCRA") {
-    if (argModel == "random") {
-      dataGet <- as.data.frame(
-        netmeta::rankogram(data, nsim = simt, random = TRUE,
-                           small.values = argPrefer)$ranking.random)
-    } else if (argModel == "common") {
-      dataGet <- as.data.frame(
-        netmeta::rankogram(data, nsim = simt, random = FALSE,
-                           small.values = argPrefer)$ranking.common)
-    }
+    dataGet <- as.data.frame(vctSUCRA)
   }
 
 
   ## 03.4 GET P-score from object of *netmeta* class -----
 
   if (argMetrics == "P-score") {
-    if (argModel == "random") {
-      dataGet <- as.data.frame(
-        netmeta::netrank(data, method = "P-score", random = TRUE,
-                         small.values = argPrefer)$ranking.random)
-    } else if (argModel == "common") {
-      dataGet <- as.data.frame(
-        netmeta::netrank(data, method = "P-score", random = FALSE,
-                         small.values = argPrefer)$ranking.common)
-    }
+    dataGet <- as.data.frame(vctPscore)
   }
 
 
   ## 03.5 GET all global metrics from object of *netmeta* class -----
 
   if (argMetrics == "ALL") {
-    if (argModel == "random") {
       dataGet <- as.data.frame(
-        cbind(
-          netmeta::rankogram(data, nsim = simt, random = TRUE,
-                             small.values = argPrefer)$ranking.matrix.random[, 1],
-          netmeta::rankogram(data,nsim = simt,random = TRUE,
-                             small.values = argPrefer)$ranking.random,
-          netmeta::netrank(data, method = "P-score", random = TRUE,
-                           small.values = argPrefer)$ranking.random
-        )
+        cbind(vctPbest, vctSUCRA, vctPscore)
       )
-    } else if (argModel == "common") {
-      dataGet <- as.data.frame(
-        cbind(
-          netmeta::rankogram(data, nsim = simt, random = FALSE,
-                             small.values = argPrefer)$ranking.matrix.common[, 1],
-          netmeta::rankogram(data, nsim = simt, random = FALSE,
-                             small.values = argPrefer)$ranking.common,
-          netmeta::netrank(data, method = "P-score", random = FALSE,
-                           small.values = argPrefer)$ranking.common
-        )
-      )
-    }
   }
 
 

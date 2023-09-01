@@ -53,6 +53,3 @@ outcome network meta-analysis: a proof-of-concept study.
 \code{\link{PlotBeads}}, \code{\link{PlotBar}},
 \code{\link{PlotLine}}, \code{\link{PlotHeat}}
 }
-\author{
-Enoch Kang
-}

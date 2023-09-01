@@ -1,18 +1,18 @@
 #' @title Illustrate bar chart of treatment ranking metrics
 #'
-#' @author Enoch Kang
-#'
 #' @description
 #' **PlotBar()** is a function for illustrating bar chart in both separated and
 #' accumulative styles.
 #'
-#' @param data DATA of metrics for treatment ranking.
-#' @param accum LOGIC value for indicating whether use accumulative probabilities.
-#'        This parameter is only for probabilities but not global metrics of
-#'        treatment ranking.
-#' @param merge LOGIC value for indicating whether merge bar charts together.
-#' @param color LIST of colors for treatments in a network meta-analysis,
-#'        or CHARACTER of a color for the bar on not accumulated bar chart.
+#' @param data    DATA of metrics for treatment ranking.
+#' @param accum   LOGIC value for indicating whether use accumulative probabilities.
+#'                This parameter is only for probabilities but not global metrics
+#'                of treatment ranking.
+#' @param merge   LOGIC value for indicating whether merge bar charts together.
+#' @param color   LIST of colors for treatments in a network meta-analysis,
+#'                or CHARACTER of a color for the bar on not accumulated bar chart.
+#' @param rotateX NUMERIC value between 0 and 360 for rotating x axis labels of
+#'                bars.
 #'
 #' @return
 #' **PlotBar()** returns a bar chart.
@@ -49,16 +49,40 @@
 
 
 PlotBar <- function(data,
-                    accum = NULL,
-                    merge = NULL,
-                    color = NULL) {
+                    accum   = NULL,
+                    merge   = NULL,
+                    color   = NULL,
+                    rotateX = NULL
+                    ) {
 
+
+  # 01. CHECK core arguments -----
+
+  lgcInher <- !inherits(data, "rankinma")
+
+  if (lgcInher) {
+    infoLgcInher <- paste(" Inherit: ERROR\n",
+                          ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
+  } else {
+    infoLgcInher <- paste(" Inherit: OK")
+  }
+
+
+  # 02. RETURN results of core argument checking  -----
+
+  if (lgcInher)
+
+    stop(infoLgcInher)
+
+
+
+  # 03. DEFINE core data -----
   dataBar   <- data$data
 
-
-  # 01 CHECK arguments -----
-
   lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score")
+
+  txs       <- unique(dataBar$tx)
+  outcomes  <- unique(dataBar$outcome)
 
   argAccum  <- ifelse(is.null(accum), FALSE,
                       ifelse(accum == FALSE, FALSE,
@@ -96,7 +120,9 @@ PlotBar <- function(data,
     argColor <- NULL
   }
 
-  lgcInher <- !inherits(data, "rankinma")
+
+
+  # 04. CHECK additive arguments -----
 
   lgcAccum <- ifelse(argAccum == TRUE,
                      ifelse(data$metrics.name != "Probabilities",
@@ -116,15 +142,16 @@ PlotBar <- function(data,
                                            TRUE, FALSE),
                                     FALSE)))
 
+  lgcRotateX <- ifelse(is.null(rotateX),
+                         FALSE,
+                         ifelse(isFALSE(length(rotateX) == 1),
+                                TRUE,
+                                ifelse(rotateX < 0 | rotateX > 360,
+                                       TRUE, FALSE)))
 
-  # 02 REPORT results from argument checking -----
 
-  if (lgcInher) {
-    infoLgcInher <- paste(" Inherit: ERROR\n",
-              ' REQUIRE: Argument "data" must be an object of class \"rankinma\".')
-  } else {
-    infoLgcInher <- paste(" Inherit: OK")
-  }
+
+  # 05 REPORT results from argument checking -----
 
   if (lgcAccum) {
     infoLgcAccum <- paste(" Accumulative: WARNING!\n",
@@ -173,24 +200,43 @@ PlotBar <- function(data,
     infoLgcColor <- paste(" Color: OK")
   }
 
+  if (lgcRotateX) {
+    infoLgcRotateX <- paste(" RotateX: WARNING!\n",
+                            ' INFORM: Argument "rotateX" should be a numeric value
+                            between 0 and 360, and *rankinma* is producing x axis
+                            labels of bars with default argument in terms of
+                            `rotateX = 0` now.')
+  } else {
+    infoLgcRotateX <- paste(" RotateX: OK")
+  }
+
 
   infoStop <- paste(infoLgcInher, "\n",
                     infoLgcAccum, "\n",
                     infoLgcMerge, "\n",
                     infoLgcColor, "\n",
+                    infoLgcRotateX, "\n",
                     sep = ""
                     )
 
   if (lgcInher | lgcColor)
     stop(infoStop)
 
-  # 03 PREPARE data -----
-
-  txs      <- unique(dataBar$tx)
-  outcomes <- unique(dataBar$outcome)
 
 
-  ## 03.1 SET colors by user-defined colors -----
+  # 06 PREPARE data -----
+
+  infoRotateX <- ifelse(max(nchar(txs)) > 10, 30, 0)
+  argRotateX  <- ifelse(is.null(rotateX),
+                        infoRotateX,
+                        ifelse(isFALSE(length(rotateX) == 1),
+                               infoRotateX,
+                               ifelse(rotateX >= 0 & rotateX <= 360,
+                                      rotateX, infoRotateX)))
+  argPosX     <- ifelse(argRotateX == 0, 4, 2)
+
+
+  ## 06.1 SET colors by user-defined colors -----
 
   colorTx <- data$color.txs
 
@@ -206,60 +252,99 @@ PlotBar <- function(data,
     }
   }
 
-  ## 03.2 SET parameters for bar chart -----
+  ## 06.2 SET parameters for bar chart -----
 
   argPlotRow <- ceiling(data$n.outcome/3)
+  #argPlotClm <- ifelse(data$n.outcome < 3,
+  #                     data$n.outcome, 3)
+
   argPlotClm <- ifelse(data$n.outcome < 3,
-                       data$n.outcome, 3)
+                       data$n.outcome,
+                       ifelse(data$n.outcome == 4, 2, 3)
+                       )
 
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
 
 
-  # 04 PLOT bar chart -----
+
+  # 07 PLOT bar chart -----
 
   if (data$metrics.name == "Probabilities") {
+
+  ## 07.1 PLOT bar chart for probabilities -----
 
     par(mar = c(5, 5, 5, 7), xpd = TRUE)
     for (outcome.i in c(1:length(outcomes))) {
 
       dataBarPlot <- dataBar[dataBar$outcomes == outcome.i, ]
 
-      barplot(as.matrix(dataBarPlot[, c(7:(length(unique(dataBarPlot$tx))+6))]),
-              cex.names = 0.8,
-              cex.axis = 0.8,
-              xlim = c(0, length(unique(dataBarPlot$tx))),
-              ylim = c(0, 1),
-              names.arg = dataBarPlot$tx,
-              yaxt = "n", ylab = "Probability", xlab = "Treatment",
-              col = if (is.null(argColor)) {
-                c(dataBarPlot$colorTx)
-              } else {
-                argColor
-              },
-              width = ifelse(argAccum == TRUE,
-                             0.8,
-                             (1/length(unique(dataBarPlot$tx)))
-              ),
-              beside = ifelse(argAccum == TRUE, FALSE, TRUE),
-              border = FALSE, legend = FALSE, frame = FALSE)
-      axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-      title(paste("Accumulative bar chart of rank probability on ",
+      plotB <- barplot(as.matrix(dataBarPlot[, c(7:(length(unique(dataBarPlot$tx))+6))]),
+                       #cex.names = 0.8,
+                       #cex.axis = 0.8,
+                       #xlim = c(0, nrow(dataBarPlot)),
+                       ylim = c(-0.2, 1.2),
+                       #names.arg = dataBarPlot$tx,
+                       yaxt = "n", xaxt = "n",
+                       ylab = "Probability", xlab = "Treatment",
+                       col = if (is.null(argColor)) {
+                         c(dataBarPlot$colorTx)
+                         } else {
+                           argColor
+                         },
+                       width = (1/length(unique(dataBarPlot$tx)))^(1/3),
+                       #ifelse(argAccum == TRUE,
+                       #       0.8,
+                       #       (1/length(unique(dataBarPlot$tx)))^(1/3)
+                       #       ),
+                       beside = ifelse(argAccum == TRUE, FALSE, TRUE),
+                       border = FALSE, legend = FALSE,
+                       frame = FALSE)
+
+      infoSpace <- (max(plotB) - max(plotB[plotB != max(plotB)])) / 2
+
+      if (argRotateX == 0) {
+        text(plotB, #c(1:nrow(dataBarPlot)),
+             rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],
+             dataBarPlot$tx,
+             cex = ifelse(max(nchar(dataBarPlot$tx)) > 10,
+                          1 / max(nchar(dataBarPlot$tx)) * 10,
+                          1),
+             col = "black",  xpd = TRUE,
+             srt = argRotateX)
+      } else {
+        text(plotB, #c(1:nrow(dataBarPlot)),
+             rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],
+             dataBarPlot$tx,
+             cex = ifelse(max(nchar(dataBarPlot$tx)) > 10,
+                          1 / max(nchar(dataBarPlot$tx)) * 10,
+                          1),
+             col = "black", xpd = TRUE,
+             pos = argPosX,
+             srt = argRotateX)
+      }
+
+      axis(side = 2, cex.axis = 0.8,
+           at = seq(0, 1, by = 0.2),
+           las = 1)
+
+      title(paste("Accumulative bar chart of rank probability on \n",
                   data$ls.outcome[outcome.i], sep = ""),
             cex.main = 1, font = 1, line = 0.5)
 
-      segments(rep(data$n.tx+0.2, nrow(dataBarPlot)),
+      segments(rep(max(plotB) + infoSpace + 0.2, nrow(dataBarPlot)),
                (0.95) / nrow(dataBarPlot) * (max(dataBarPlot$txs) + 1 - dataBarPlot$txs),
-               rep(data$n.tx+0.3, nrow(dataBarPlot)),
+               rep(max(plotB) + infoSpace + 0.3, nrow(dataBarPlot)),
                (0.95) / nrow(dataBarPlot) * (max(dataBarPlot$txs) + 1 - dataBarPlot$txs),
                lwd = 10,
                col = if (is.null(argColor)) {
                  c(dataBarPlot$colorTx)
                } else {
-                 argColor}
-      )
+                 argColor
+                 }
+               )
 
-      text(rep(data$n.tx+0.4, nrow(dataBarPlot)),
+      text(rep(max(plotB) + infoSpace + 0.4, nrow(dataBarPlot)),
            (0.95) / nrow(dataBarPlot) * (max(dataBarPlot$txs) + 1 - dataBarPlot$txs),
            paste("Rank ", dataBarPlot$rank, sep = ""),
            pos = 4,
@@ -270,26 +355,57 @@ PlotBar <- function(data,
     }
   } else {
 
+    ## 07.2 PLOT bar chart for global metrics -----
+
     for (outcome.i in c(1:length(outcomes))) {
 
-      dataBarPlot <- dataBar[dataBar$outcomes == outcome.i, ]
+      dataBarPlot             <- dataBar[dataBar$outcomes == outcome.i, ]
 
-      dataBarPlot <- dataBarPlot[order(-dataBarPlot$txs),]
-      dataBarPlot$seq.tx <- c(1:nrow(dataBarPlot))
+      dataBarPlot             <- dataBarPlot[order(-dataBarPlot$txs),]
+      dataBarPlot$seq.tx      <- c(1:nrow(dataBarPlot))
+      dataBarPlot             <- dataBarPlot[order(dataBarPlot$metrics, decreasing = TRUE),]
+      dataBarPlot$seq.metrics <- c(1:nrow(dataBarPlot))
 
-      barplot(dataBarPlot[, "metrics"],
-              cex.names = 0.8,
-              cex.axis = 0.8,
-              xlim = c(0, max(dataBarPlot$seq.tx)),
-              ylim = c(0, 1),
-              names.arg = dataBarPlot$tx,
-              yaxt = "n", ylab = data$metrics.name, xlab = "Treatment",
-              col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]),
-              width = 0.8,
-              beside = FALSE,
-              border = FALSE, legend = FALSE, frame = FALSE)
-      axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-      title(paste("Bar chart of ", data$metrics.name, " on ",
+      plotB <- barplot(dataBarPlot[, "metrics"],
+                       #cex.names = 0.8,
+                       #cex.axis = 0.8,
+                       #xlim = c(0, nrow(dataBarPlot)),
+                       ylim = c(-0.2, 1.2),
+                       #names.arg = dataBarPlot$tx,
+                       yaxt = "n", xaxt = "n",
+                       ylab = data$metrics.name, xlab = "Treatment",
+                       col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]),
+                       width = (1/length(unique(dataBarPlot$tx)))^(1/3), #0.8,
+                       beside = FALSE,
+                       border = FALSE, legend = FALSE,
+                       frame = FALSE)
+
+      if (argRotateX == 0) {
+        text(plotB, #c(1:nrow(dataBarPlot)),
+             rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],
+             dataBarPlot$tx,
+             cex = ifelse(max(nchar(dataBarPlot$tx)) > 10,
+                          1 / max(nchar(dataBarPlot$tx)) * 10,
+                          1),
+             col = "black", xpd = TRUE,
+             srt = argRotateX)
+      } else {
+        text(plotB, #c(1:nrow(dataBarPlot)),
+             rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],
+             dataBarPlot$tx,
+             cex = ifelse(max(nchar(dataBarPlot$tx)) > 10,
+                          1 / max(nchar(dataBarPlot$tx)) * 10,
+                          1),
+             col = "black", xpd = TRUE,
+             pos = argPosX,
+             srt = argRotateX)
+      }
+
+      axis(side = 2, cex.axis = 0.8,
+           at = seq(0, 1, by = 0.2),
+           las = 1)
+
+      title(paste("Bar chart of ", data$metrics.name, " on \n",
                   data$ls.outcome[outcome.i], sep = ""),
             cex.main = 1, font = 1, line = 0.5)
     }
@@ -297,48 +413,61 @@ PlotBar <- function(data,
 
   if (argMerge == TRUE) {
     par(mfrow = c(argPlotRow, argPlotClm),
-        oma = c(4,4,4,0.5),
-        mai = c(0.3,0.3,0.3,0.3))
-
-    #for (i.otcm in c(1:length(unique(dataBar$outcome)))) {
-    #  par(mar = c(2, 4, 2, 4), xpd = TRUE)
-    #  barplot(dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "metrics"],
-    #          cex.names = 0.8,
-    #          cex.axis = 0.8,
-    #          xlim = c(0, length(unique(dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"]))),
-    #          ylim = c(0, 1),
-    #          names.arg = dataBar[dataBar$outcome == unique(dataBar$outcome)[i.otcm], "tx"],
-    #          yaxt = "n",
-    #          col = c(dataBar$colorTx),
-    #          width = 1/length(unique(dataBar$tx)),
-    #          legend = FALSE, beside = FALSE, border = FALSE)
-    #  axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
-    #  title(data$ls.outcome[i.otcm], cex.main = 0.8, font = 1, line = 0.5)
-    #}
+        oma = c(4, 4, 4, 0.5),
+        mai = c(0.3, 0.3, 0.3, 0.3))
 
     for (outcome.i in c(1:length(outcomes))) {
 
-      dataBarPlot <- dataBar[dataBar$outcomes == outcome.i, ]
+      dataBarPlot             <- dataBar[dataBar$outcomes == outcome.i, ]
 
-      dataBarPlot <- dataBarPlot[order(-dataBarPlot$txs),]
-      dataBarPlot$seq.tx <- c(1:nrow(dataBarPlot))
+      dataBarPlot             <- dataBarPlot[order(-dataBarPlot$txs), ]
+      dataBarPlot$seq.tx      <- c(1:nrow(dataBarPlot))
+      dataBarPlot             <- dataBarPlot[order(dataBarPlot$metrics, decreasing = TRUE), ]
+      dataBarPlot$seq.metrics <- c(1:nrow(dataBarPlot))
 
-      barplot(dataBarPlot[, "metrics"],
-              cex.names = 0.8,
-              cex.axis = 0.8,
-              xlim = c(0, max(dataBarPlot$seq.tx)),
-              ylim = c(0, 1),
-              names.arg = dataBarPlot$tx, las = 1,
-              yaxt = "n", ylab = data$metrics.name, xlab = "Treatment",
-              col = if (length(color) == data$n.tx) {
-                dataBarPlot$colorTx
-              } else {
-                ifelse(is.null(argColor), "dodgerblue3", argColor[1])
-              },
-              width = 0.8,
-              beside = FALSE,
-              border = FALSE, legend = FALSE, frame = FALSE)
-      axis(side = 2, cex.axis = 0.8, at = seq(0, 1, by = 0.1), las = 1)
+      plotB <- barplot(dataBarPlot[, "metrics"],
+                       #cex.names = 0.8,
+                       #cex.axis = 0.8,
+                       #xlim = c(0, nrow(dataBarPlot)),
+                       ylim = c(-0.2, 1.2),
+                       #names.arg = dataBarPlot$tx, las = 1,
+                       yaxt = "n", xaxt = "n",
+                       ylab = data$metrics.name, xlab = "", #"Treatment",
+                       col = if (length(color) == data$n.tx) {
+                         dataBarPlot$colorTx
+                         } else {
+                           ifelse(is.null(argColor), "dodgerblue3", argColor[1])
+                         },
+                       width = (1/length(unique(dataBarPlot$tx)))^(1/3), #0.8,
+                       beside = FALSE,
+                       border = FALSE, legend = FALSE,
+                       frame = FALSE)
+
+      if (argRotateX == 0) {
+        text(plotB, #c(1:nrow(dataBarPlot)),
+             rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],
+             dataBarPlot$tx,
+             cex = ifelse(max(nchar(dataBarPlot$tx)) > 10,
+                          1 / max(nchar(dataBarPlot$tx)) * 10,
+                          1),
+             col = "black", xpd = TRUE,
+             srt = argRotateX)
+      } else {
+        text(plotB, #c(1:nrow(dataBarPlot)),
+             rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],
+             dataBarPlot$tx,
+             cex = ifelse(max(nchar(dataBarPlot$tx)) > 10,
+                          1 / max(nchar(dataBarPlot$tx)) * 10,
+                          1),
+             col = "black", xpd = TRUE,
+             pos = argPosX,
+             srt = argRotateX)
+      }
+
+      axis(side = 2, cex.axis = 0.8,
+           at = seq(0, 1, by = 0.2),
+           las = 1)
+
       title(paste(data$ls.outcome[outcome.i], sep = ""),
             cex.main = 1, font = 1, line = 0.5)
     }
@@ -349,10 +478,12 @@ PlotBar <- function(data,
                 sep = ""),
           side = 3, font = 2, line = -0.5, outer = TRUE)
     mtext(ifelse(data$metrics.name %in% lsMetrics,data$metrics.name, "???"),
-          side = 2, font = 1, line = 1, outer = TRUE)
+          side = 2, font = 1, line = 1, #adj = ifelse(argPlotRow == 1, 0.65, 0.5),
+          outer = TRUE)
     mtext("Treatment",
-          side = 1, font = 1, line = 1, outer = TRUE)
-    par(mfrow=c(1,1))
+          side = 1, font = 1, line = 1,
+          outer = TRUE)
+    par(mfrow = c(1, 1))
   }
 
 }
