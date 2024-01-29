@@ -62,7 +62,7 @@ GetMetrics <- function(data,
 
   # 01 CHECK arguments -----
 
-  lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score", "ALL")
+  lsMetrics <- c("Probabilities", "P-best", "SUCRA", "P-score", "ES", "ALL")
 
   argOutcome <- ifelse(!is.null(outcome), outcome, "outcome")
   argPrefer  <- ifelse(prefer == "small", "good",
@@ -159,6 +159,13 @@ GetMetrics <- function(data,
                                      random = TRUE,
                                      small.values = argPrefer)$ranking.random
 
+    if (data$sm == "MD" | data$sm == "SMD") {
+      vctES <- data$TE.random[, which(colnames(data$TE.random) == data$reference.group)]
+    } else {
+      vctES <- exp(data$TE.random[, which(colnames(data$TE.random) == data$reference.group)])
+    }
+
+
   } else {
     set.seed(101020)
     outRankogram <- netmeta::rankogram(data, nsim = simt,
@@ -176,6 +183,12 @@ GetMetrics <- function(data,
     vctSUCRA     <- netmeta::netrank(data, method = "SUCRA",
                                      common = TRUE,
                                      small.values = argPrefer)$ranking.common
+
+    if (data$sm == "MD" | data$sm == "SMD") {
+      vctES <- data$TE.common[, which(colnames(data$TE.common) == data$reference.group)]
+    } else {
+      vctES <- exp(data$TE.common[, which(colnames(data$TE.common) == data$reference.group)])
+    }
 
   }
 
@@ -204,6 +217,9 @@ GetMetrics <- function(data,
 
   if (argMetrics == "P-best") {
       dataGet <- as.data.frame(vctPbest)
+
+      dataGet$namSM <- data$sm
+      dataGet$ES    <- vctES
   }
 
 
@@ -211,6 +227,9 @@ GetMetrics <- function(data,
 
   if (argMetrics == "SUCRA") {
     dataGet <- as.data.frame(vctSUCRA)
+
+    dataGet$namSM <- data$sm
+    dataGet$ES    <- vctES
   }
 
 
@@ -218,6 +237,9 @@ GetMetrics <- function(data,
 
   if (argMetrics == "P-score") {
     dataGet <- as.data.frame(vctPscore)
+
+    dataGet$namSM <- data$sm
+    dataGet$ES    <- vctES
   }
 
 
@@ -227,6 +249,8 @@ GetMetrics <- function(data,
       dataGet <- as.data.frame(
         cbind(vctPbest, vctSUCRA, vctPscore)
       )
+      dataGet$namSM <- data$sm
+      dataGet$ES    <- vctES
   }
 
 
@@ -242,13 +266,14 @@ GetMetrics <- function(data,
                                 length(dataGet),
                                 2:length(dataGet)-2)]
   } else if (argMetrics == "ALL") {
-    colnames(dataGet) <- c("P-best", "SUCRA", "P-score")
+    colnames(dataGet) <- c("P-best", "SUCRA", "P-score", "Measure", "Effect")
     dataGet$tx        <- rownames(dataGet)
-    dataGet           <- dataGet[, c(4, 1, 2, 3)]
+    dataGet           <- dataGet[, c(length(dataGet), 1:(length(dataGet) - 1))]
   } else {
-    colnames(dataGet) <- argMetrics
+    colnames(dataGet) <- c(argMetrics, "Measure", "Effect")
     dataGet$tx        <- rownames(dataGet)
-    dataGet           <- dataGet[, c(2, 1)]
+    dataGet           <- dataGet[, c(length(dataGet), 1:(length(dataGet) - 1))]
+    #dataGet           <- dataGet[, c(2, 1)]
   }
 
   if (argOutcome == "outcome") {

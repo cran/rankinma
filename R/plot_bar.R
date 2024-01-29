@@ -380,6 +380,21 @@ PlotBar <- function(data,
                        border = FALSE, legend = FALSE,
                        frame = FALSE)
 
+      #infoBarWidth <- (abs(max(plotB)) - abs(max(plotB))) / nrow(plotB)
+
+      #plot(c(-0.3, -0.3),
+      #     c((max(plotB) + infoBarWidth * 0.45) * 1.3, 1.3),
+      #     yaxt = "n", xaxt = "n",
+      #     pch = "",
+      #     col = rgb(1, 1, 1, 1),
+      #     frame = FALSE)
+      #rect(plotB - (infoBarWidth * 0.45),
+      #     rep(0, nrow(plotB)),
+      #     plotB + (infoBarWidth * 0.45),
+      #     dataBarPlot[, "metrics"],
+      #     lty = 0,
+      #     col = ifelse(is.null(argColor), "dodgerblue3", argColor[1]))
+
       if (argRotateX == 0) {
         text(plotB, #c(1:nrow(dataBarPlot)),
              rep(-0.1, nrow(dataBarPlot)), #par("usr")[3],

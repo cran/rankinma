@@ -192,6 +192,11 @@ SetMetrics <- function(data,
   outcomes     <- unique(data$outcome)
   infoOutcomes <- length(outcomes)
 
+  if (metrics.name != "Probabilities") {
+    colnames(data)[length(data) - 1] <- "ES"
+    colnames(data)[length(data) - 2] <- "SM"
+  }
+
   for (i in c(1:nrow(data))) {
     data[i, "txs"] <- which(as.character(txs) == as.character(data[i, "tx"]))
   }
@@ -228,10 +233,25 @@ SetMetrics <- function(data,
       data[, c(3:(nrow(data) * 2 + 2))]))
   } else {
 
-    dataSet <- data[, c("outcome", "outcomes", "importance", "tx", "txs", "colorTx", "metrics")]
+    dataSet <- data[, c("outcome", "outcomes", "importance", "tx", "txs", "colorTx", "metrics", "SM", "ES")]
 
     for (outcome.i in c(1:max(dataSet$outcomes))) {
       dataTempA <- dataSet[dataSet$outcomes == outcome.i, ]
+      dataTempA <- dataTempA[order(dataTempA$metrics, decreasing = TRUE), ]
+
+      dataTempA$rank  <- 0
+
+      for (tx.i in c(1:nrow(dataTempA))) {
+        if (tx.i == 1) {
+          dataTempA[tx.i, "rank"]  <- 1
+        } else {
+          dataTempA[tx.i, "rank"] <- ifelse(dataTempA[tx.i, "metrics"] == dataTempA[tx.i - 1, "metrics"],
+                                            dataTempA[tx.i - 1, "rank"],
+                                            tx.i)
+        }
+      }
+
+      dataTempA$place <- (max(dataTempA$rank) - dataTempA$rank) / (max(dataTempA$rank) - 1)
 
       if (length(which(as.data.frame(table(dataTempA$metrics))$Freq > 1)) > 0) {
         for (tx.i in c(1:(nrow(dataTempA) - 1))) {

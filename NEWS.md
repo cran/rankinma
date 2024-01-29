@@ -1,6 +1,32 @@
 # Change of package `rankinma`
 
 
+## rankinma 0.2.0
+### Date: July 03, 2023
+
+**Update to CRAN**  
+\
+
+
+### Date: January 27, 2024
+
+**Modify function:** improve function `PlotBeads()` with newly added parameter `scaleX`, `txtValue`, `szFntTxt`, and `rotateTxt` for allowing user to set scale of x-axis, and show further information of each point with changeable font size and angle.
+\
+
+
+### Date: January 20, 2024
+
+**Modify function:** improve function `SetMetrics()` in order to set measured effects for further uses in graphics.
+\
+
+
+### Date: January 13, 2024
+
+**Modify function:** improve function `GetMetrics()` in order to get measured effects.
+\
+
+
+
 ## rankinma 0.1.9
 ### Date: August 31, 2023
 
@@ -12,6 +38,7 @@
 **Modify document:** improve *rankinma* package manual by detailing returned values from function `SetMetrics()`.
 \
 
+
 ### Date: August 08, 2023
 
 **Modify document:** improve *rankinma* package manual by displaying description and details.
@@ -20,6 +47,7 @@
 **Modify function:** improve function `GetMetrics()` in order to get SUCRA consistently and reproducibly.
 \
 
+
 ### Date: July 31, 2023
 
 **Modify function:** improve function `PlotBeads()` with newly added parameter `szPnt`, `szFntTtl`, `szFntTtlX`, `szFntX`, `szFntY`, and `szFntLgnd` for allowing user to change size of beads, font size of main title for beading plot, font size of title on X-axis, font size of numeric scale on X-axis, font size of outcome name(s), and legend font size. Minor modification was also done for sorting legend by alphabet.
@@ -27,6 +55,7 @@
 
 **Modify function:** improve function `PlotHeat()` with a newly added parameter `szFntY` for allowing user to change font size of outcome name(s).
 \
+
 
 ### Date: July 30, 2023
 

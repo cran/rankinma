@@ -6,17 +6,25 @@
 \usage{
 PlotBeads(
   data,
+  scaleX = "Rank",
+  txtValue = "Effects",
   color = NULL,
   szPnt = NULL,
   szFntTtl = NULL,
   szFntTtlX = NULL,
   szFntX = NULL,
   szFntY = NULL,
-  szFntLgnd = NULL
+  szFntTxt = NULL,
+  szFntLgnd = NULL,
+  rotateTxt = 60
 )
 }
 \arguments{
 \item{data}{DATA of metrics for treatment ranking.}
+
+\item{scaleX}{STRING for indicating scale on the x axis.}
+
+\item{txtValue}{STRING for indicating labels of metrics or effects on each point.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis.}
 
@@ -30,7 +38,12 @@ PlotBeads(
 
 \item{szFntY}{NUMERIC value for indicating font size of outcome name(s).}
 
+\item{szFntTxt}{NUMERIC value for indicating font size of value of each point.}
+
 \item{szFntLgnd}{NUMERIC value for indicating legend font size.}
+
+\item{rotateTxt}{NUMERIC value between 0 and 360 for rotating labels of text values
+of each point.}
 }
 \value{
 \strong{PlotBeads()} returns a beading plot.
@@ -62,6 +75,11 @@ PlotBeads(
 #PlotBeads(data = dataRankinma)
 ## End(Not run)
 
+}
+\references{
+Chen, C., Chuang, Y.C., Chan, E., Chen, J.H., Hou, W.H., & Kang, E. (2023).
+Beading plot: A novel graphics for ranking interventions in network evidence.
+PREPRINT (Version 1) available at Research Square.
 }
 \seealso{
 \code{\link{GetMetrics}}, \code{\link{SetMetrics}}

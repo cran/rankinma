@@ -1,4 +1,4 @@
-#' rankinma: Ranking in Network Meta-Analysis
+#' rankinma: Rank in Network Meta-Analysis
 #'
 #' @description
 #' \emph{rankinma} is an R package that supports users to easily obtain and

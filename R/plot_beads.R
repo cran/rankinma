@@ -6,16 +6,26 @@
 #' **PlotBeads()** is a function for illustrating beading plot.
 #'
 #' @param data      DATA of metrics for treatment ranking.
+#' @param scaleX    STRING for indicating scale on the x axis.
+#' @param txtValue  STRING for indicating labels of metrics or effects on each point.
 #' @param color     LIST of colors for treatments in a network meta-analysis.
 #' @param szPnt     NUMERIC value for indicating point size of ranking metrics.
 #' @param szFntTtl  NUMERIC value for indicating font size of main title.
 #' @param szFntTtlX NUMERIC value for indicating font size of title on X-axis.
 #' @param szFntX    NUMERIC value for indicating font size of numeric scale on X-axis.
 #' @param szFntY    NUMERIC value for indicating font size of outcome name(s).
+#' @param szFntTxt  NUMERIC value for indicating font size of value of each point.
 #' @param szFntLgnd NUMERIC value for indicating legend font size.
+#' @param rotateTxt NUMERIC value between 0 and 360 for rotating labels of text values
+#'                  of each point.
 #'
 #' @return
 #' **PlotBeads()** returns a beading plot.
+#'
+#' @references
+#' Chen, C., Chuang, Y.C., Chan, E., Chen, J.H., Hou, W.H., & Kang, E. (2023).
+#' Beading plot: A novel graphics for ranking interventions in network evidence.
+#' PREPRINT (Version 1) available at Research Square.
 #'
 #' @seealso \code{\link{GetMetrics}}, \code{\link{SetMetrics}}
 #'
@@ -46,13 +56,17 @@
 #' @export PlotBeads
 
 PlotBeads <- function(data,
+                      scaleX    = "Rank",
+                      txtValue  = "Effects",
                       color     = NULL,
                       szPnt     = NULL,
                       szFntTtl  = NULL,
                       szFntTtlX = NULL,
                       szFntX    = NULL,
                       szFntY    = NULL,
-                      szFntLgnd = NULL) {
+                      szFntTxt  = NULL,
+                      szFntLgnd = NULL,
+                      rotateTxt = 60) {
 
 
   # 01. CHECK core arguments -----
@@ -86,6 +100,8 @@ PlotBeads <- function(data,
 
   txs       <- unique(dataBeads$tx)
   outcomes  <- unique(dataBeads$outcome)
+  lsScaleX  <- c("Rank", "Numeric")
+  lsTxtVal  <- c("Effects", "Metrics", "None")
 
 
 
@@ -94,6 +110,14 @@ PlotBeads <- function(data,
   lgcMtrcs  <- ifelse(data$metrics.name == "Probabilities",
                       TRUE,
                       FALSE)
+
+  lgcScaleX <- ifelse(scaleX %in% lsScaleX,
+                      FALSE,
+                      TRUE)
+
+  lgcTxtVal <- ifelse(txtValue %in% lsTxtVal,
+                      FALSE,
+                      TRUE)
 
   lgcColor  <- ifelse(length(which(ls()%in%ls(pattern = "color"))) > 0, FALSE,
                       ifelse(length(color) != data$n.tx,
@@ -159,6 +183,18 @@ PlotBeads <- function(data,
                                                   TRUE, FALSE))))
                       )
 
+  lgcSzFntTxt <- ifelse(is.null(szFntTxt),
+                      FALSE,
+                      ifelse(isFALSE(length(szFntTxt) == 1 | length(szFntTxt) == length(outcomes)),
+                             TRUE,
+                             ifelse(isFALSE(is.numeric(szFntTxt)),
+                                    TRUE,
+                                    ifelse(FALSE %in% (szFntTxt >= 0),
+                                           TRUE,
+                                           ifelse(FALSE %in% (szFntTxt < 6),
+                                                  TRUE, FALSE))))
+                      )
+
   lgcSzFntLgnd <- ifelse(is.null(szFntLgnd),
                          FALSE,
                          ifelse(isFALSE(length(szFntLgnd) == 1),
@@ -171,6 +207,13 @@ PlotBeads <- function(data,
                                                      TRUE, FALSE))))
                          )
 
+  lgcRotateTxt <- ifelse(is.null(rotateTxt),
+                       FALSE,
+                       ifelse(isFALSE(length(rotateTxt) == 1),
+                              TRUE,
+                              ifelse(rotateTxt < 0 | rotateTxt > 360,
+                                     TRUE, FALSE)))
+
 
 
   # 05 REPORT results from argument checking -----
@@ -180,6 +223,20 @@ PlotBeads <- function(data,
                             ' REQUIRE: Metrics should not be "Probabilities."')
   } else {
     infoLgcMetrics <- paste(" Metrics: OK")
+  }
+
+  if (lgcScaleX) {
+    infoLgcScaleX  <- paste(" Scale on x-axis: ERROR\n",
+                            ' REQUIRE: Argument "scaleX" should be "Rank" or "Numeric."')
+  } else {
+    infoLgcScaleX  <- paste(" Scale on x-axis: OK")
+  }
+
+  if (lgcTxtVal) {
+    infoLgcTxtVal  <- paste(" Label of values: ERROR\n",
+                            ' REQUIRE: Argument "txtValue" should be "Effects" or "Metrics"')
+  } else {
+    infoLgcTxtVal  <- paste(" Label of values: OK")
   }
 
   if (lgcColor) {
@@ -219,29 +276,64 @@ PlotBeads <- function(data,
     infoStopSzFntY <- paste(" Font size of outcome name(s): OK")
   }
 
+  if (lgcSzFntTxt) {
+    infoStopSzFntTxt <- 'Argument "szFntTxt" must be a numeric value between 0 and 5 for indicating font size of value of each point.'
+  } else {
+    infoStopSzFntTxt <- paste(" Font size of point value(s): OK")
+  }
+
   if (lgcSzFntLgnd) {
     infoStopSzFntLgnd <- 'Argument "szFntLgnd" must be a numeric value between 0 and 5 for indicating legend font.'
   } else {
     infoStopSzFntLgnd <- paste(" Legend font size: OK")
   }
 
-  infoStop <- paste(infoLgcInher, "\n",
-                    infoLgcMetrics, "\n",
-                    infoLgcColor, "\n",
-                    infoStopSzPnt, "\n",
-                    infoStopSzFntTtl, "\n",
+  if (lgcRotateTxt) {
+    infoLgcRotateTxt <- paste(" Rotate labels of values: WARNING!\n",
+                            ' INFORM: Argument "rotateTxt" should be a numeric value
+                            between 0 and 360, and *rankinma* is producing label of
+                            value for each point with default argument in terms of
+                            `rotateTxt = 60`.')
+  } else {
+    infoLgcRotateTxt <- paste(" Rotate labels of values: OK")
+  }
+
+  infoStop <- paste(infoLgcInher,      "\n",
+                    infoLgcMetrics,    "\n",
+                    infoLgcScaleX,     "\n",
+                    infoLgcTxtVal,     "\n",
+                    infoLgcColor,      "\n",
+                    infoStopSzPnt,     "\n",
+                    infoStopSzFntTtl,  "\n",
                     infoStopSzFntTtlX, "\n",
-                    infoStopSzFntX, "\n",
-                    infoStopSzFntY, "\n",
+                    infoStopSzFntX,    "\n",
+                    infoStopSzFntY,    "\n",
+                    infoStopSzFntTxt,  "\n",
                     infoStopSzFntLgnd, "\n",
+                    infoLgcRotateTxt,  "\n",
                     sep = "")
 
-  if (lgcInher | lgcMtrcs | lgcColor)
+  if (lgcInher | lgcMtrcs | lgcScaleX | lgcTxtVal | lgcColor)
     stop(infoStop)
 
 
 
   # 06 PROCESS additive setting -----
+
+  infoScaleX <- scaleX
+  infoTxtVal <- txtValue
+
+  if (infoTxtVal == "Effects") {
+    dataBeads$txtVal <- paste(dataBeads$SM, ": ",
+                              round(dataBeads$ES, 2),
+                              sep = "")
+  } else if (infoTxtVal == "Metrics") {
+    dataBeads$txtVal <- paste(data$metrics.name, ": ",
+                              round(dataBeads$metrics, 2),
+                              sep = "")
+  } else {
+    dataBeads$txtVal <- NA
+  }
 
   dataBeads$importance  <- dataBeads$outcomes
   dataBeads$shape       <- 16
@@ -255,6 +347,10 @@ PlotBeads <- function(data,
   dataBeadsPlot <- dataBeads
 
   colorTx <- data$color.txs
+  data$n.char.outcome <- nchar(data$n.outcome)
+
+  infoMaxChar         <- max(data$n.char.outcome)
+  infoExcessSpaceLeft <- -(infoMaxChar/5)
 
   if (!is.null(color)) {
     if (length(which(ls() %in% ls(pattern = "color"))) > 0) {
@@ -310,6 +406,14 @@ PlotBeads <- function(data,
     dataBeadsPlot$szFntY <- szFntY
   }
 
+  if (is.null(szFntTxt)) {
+    infoSzFntTxt           <- 0.8
+    dataBeadsPlot$szFntTxt <- infoSzFntTxt
+  } else {
+    infoSzFntTxt           <- szFntTxt
+    dataBeadsPlot$szFntTxt <- szFntTxt
+  }
+
   if (is.null(szFntLgnd)) {
     infoSzFntLgnd           <- ifelse(max(nchar(dataBeadsPlot$tx)) > 10,
                                       1 / max(nchar(dataBeadsPlot$tx)) * 10,
@@ -320,6 +424,7 @@ PlotBeads <- function(data,
     dataBeadsPlot$szFntLgnd <- szFntLgnd
   }
 
+  infoRotateTxt <- rotateTxt
 
 
   # 07 PLOT heat plot -----
@@ -333,14 +438,12 @@ PlotBeads <- function(data,
 
   plot(dataBeadsPlot$metrics,
        dataBeadsPlot$seq.axis.y - 0.5, frame.plot = FALSE,
-       xlim = c(-0.3, 1.3),
+       #xlim = c(-0.3, 1.3),
+       xlim = c(infoExcessSpaceLeft, 1.3),
        ylim = c(0, ceiling(max(dataBeadsPlot$importance, na.rm = TRUE))),
        xlab = "", xaxt = "n", yaxt = "n",ylab="",
        pch = 0,
        cex = 0)
-
-  axis(side = 1, at = c(0, 0.2, 0.4, 0.6, 0.8, 1),
-       cex.axis = infoSzFntX)
 
   axis(side = 3, at = c(0.5),
        line = -2,
@@ -350,32 +453,82 @@ PlotBeads <- function(data,
        font = 2,
        cex.axis = infoSzFntTtl)
 
-  axis(side = 1, at = c(0.5), line = 2, tick = FALSE,
-       labels = paste("Worse <---   ", data$metrics.name,
-                      "   ---> Better", sep = ""),
-       font = 1,
-       cex.axis = infoSzFntTtlX)
-
-  text(rep(-0.3, data$n.outcome),
+  #text(rep(-0.3, data$n.outcome),
+  text(rep(-0.05, data$n.outcome),
        unique(dataBeadsPlot$seq.outcome) - 0.5,
        c(unique(dataBeadsPlot$outcome)),
        cex = dataBeadsPlot$szFntY,
-       pos = 4)
+       pos = 2)
 
   segments(0, c(dataBeadsPlot$outcomes) - 0.5,
            1, c(dataBeadsPlot$outcomes) - 0.5,
            col = "gray",
            lty = c(rep(1, data$n.outcome)))
 
-  points(dataBeadsPlot$metrics,
-         dataBeadsPlot$seq.axis.y - 0.5,
-         pch = dataBeadsPlot$shape,
-         col = c(dataBeadsPlot$colorTx),
-         bg = c(dataBeadsPlot$colorTx),
-         cex = infoSzPnt)
+
+  if (infoScaleX == "Rank") {
+    axis(side = 1, at = c(0, 1),
+         labels = c("Last", "Best"),
+         cex.axis = infoSzFntX)
+
+    axis(side = 1, at = c(0.5), line = 2, tick = FALSE,
+         labels = paste("Rank order based on ",
+                        data$metrics.name,
+                        sep = ""),
+         font = 1,
+         cex.axis = infoSzFntTtlX)
+
+    points(dataBeadsPlot$place,
+           dataBeadsPlot$seq.axis.y - 0.5,
+           pch = dataBeadsPlot$shape,
+           col = c(dataBeadsPlot$colorTx),
+           bg = c(dataBeadsPlot$colorTx),
+           cex = infoSzPnt)
+  } else {
+    axis(side = 1, at = c(0, 0.2, 0.4, 0.6, 0.8, 1),
+         cex.axis = infoSzFntX)
+
+    axis(side = 1, at = c(0.5), line = 2, tick = FALSE,
+         labels = paste("Worse <---   ",
+                        data$metrics.name,
+                        "   ---> Better",
+                        sep = ""),
+         font = 1,
+         cex.axis = infoSzFntTtlX)
+
+    points(dataBeadsPlot$metrics,
+           dataBeadsPlot$seq.axis.y - 0.5,
+           pch = dataBeadsPlot$shape,
+           col = c(dataBeadsPlot$colorTx),
+           bg = c(dataBeadsPlot$colorTx),
+           cex = infoSzPnt)
+  }
 
 
-  ## 07.2 Legend -----
+  ## 07.2 Text values on each point -----
+
+  if (infoScaleX == "Rank") {
+    text(dataBeadsPlot$place,
+         dataBeadsPlot$seq.axis.y - 0.6,
+         dataBeadsPlot$txtVal,
+         col = "gray25",
+         cex = infoSzFntTxt,
+         pos = 2,
+         srt = infoRotateTxt)
+  } else {
+    text(dataBeadsPlot$metrics,
+         dataBeadsPlot$seq.axis.y - 0.6,
+         dataBeadsPlot$txtVal,
+         col = "gray25",
+         cex = infoSzFntTxt,
+         pos = 2,
+         srt = infoRotateTxt)
+  }
+
+
+
+
+  ## 07.3 Legend -----
 
   dataLgnd <- dataBeadsPlot[order(dataBeadsPlot$tx), ]
   vctTx    <- unique(dataLgnd$tx)
@@ -393,4 +546,5 @@ PlotBeads <- function(data,
        vctTx,
        cex = infoSzFntLgnd,
        pos = 4)
+
 }

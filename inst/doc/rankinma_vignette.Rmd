@@ -1,7 +1,7 @@
 ---
 title: "An overview on rankinma"
 author: "Enoch Kang, Chiehfeng Chen Wen-Hsuan Hou, Jin-Hua Chen, Yu-Chieh Chuang, & Edwin Chan"
-date: "August 31, 2023"
+date: "January 29, 2024"
 description: > 
   Ranking in network meta-analysis.
 output: 
@@ -62,23 +62,12 @@ Briefly, *rankinma* can be used for visualization of both detailed metrics of pr
 
 Users can visualize treatment ranking after network meta-analysis in five steps, but have to check condition before using *rankinma*.
 
-**Situation 1:** Users have treatment ranking metrics of outcome(s).  
+**Situation 1:** Users have data for network meta-analysis of **a single outcome** but do not get treatment ranking metrics yet.
   
-**Situation 2:** Users have data for network meta-analysis of **a single outcome** but do not get treatment ranking metrics yet.
-  
-**Situation 3:** Users have data for network meta-analysis of **various outcomes** but do not get treatment ranking metrics yet.  
+**Situation 2:** Users have data for network meta-analysis of **various outcomes** but do not get treatment ranking metrics yet.  
 \
 
 #### For situation 1:
-
-**Step 1.** Build or load data of treatment ranking metrics.
-
-**Step 2.** Setup data in *rankinma* format using function `SetMetrics()`.
-
-**Step 3.** Visualization using function `PlotBeads()`, `PlotHeat()`, `PlotBar()`, or `PlotLine()`.
-
-
-#### For situation 2:
 
 **Step 1.** Load data and do network meta-analysis.
 
@@ -89,7 +78,7 @@ Users can visualize treatment ranking after network meta-analysis in five steps,
 **Step 4.** Visualization using function `PlotBeads()`, `PlotHeat()`, `PlotBar()`, or `PlotLine()`.
 
 
-#### For situation 3:
+#### For situation 2:
 
 **Step 1.** Load data and do network meta-analysis.
 
@@ -108,47 +97,7 @@ Users can visualize treatment ranking after network meta-analysis in five steps,
 
 The following steps and syntax demonstrate how user can illustrate a summary of treatment ranking metrics on various outcomes from network meta-analysis.
 
-Example 1 for illustrating bar chart when users already have treatment ranking metrics (e.g. P-score).
-
-> **STEP 1.** Build data
-> ```{r, eval = FALSE}
-data <- data.frame(tx = c("A", "B", "C", "A", "B", "C"),
-                   outcome = c("mortality", "mortality", "mortality", "recurrent", "recurrent", "recurrent"), 
-                   SUCRA = c(0.8, 0.7, 0.5, 0.9, 0.5, 0.8))
-> ```
->
-> **STEP 2.** Set data for rankinma
-> ```{r, eval = FALSE}
-dataRankinma <- SetMetrics(data, 
-                           tx = tx, 
-                           outcome = outcome, 
-                           metrics = SUCRA, 
-                           metrics.name = "SUCRA")
-> ```
->
-> **STEP 3.** Illustrate bar chart
-> ```{r, eval = FALSE}
-PlotBar(data = dataRankinma)
-> ```
-> 
-> Output:
->
-> ```{r, echo = FALSE, warning = FALSE, results = FALSE, message = FALSE, error = FALSE, fig.keep = "all", fig.cap = c("", "Figure 1. examples of bar chart for SUCRA on two outcomes."), fig.height = 5, fig.width = 5, fig.align = "center", out.width = "50%"}
-library("rankinma")
-data <- data.frame(tx = c("A", "B", "C", "A", "B", "C"),
-                   outcome = c("mortality", "mortality", "mortality", "recurrent", "recurrent", "recurrent"), 
-                   SUCRA = c(0.8, 0.7, 0.5, 0.9, 0.5, 0.8))
-dataRankinma <- SetMetrics(data, 
-                           tx = tx, 
-                           outcome = outcome, 
-                           metrics = SUCRA, 
-                           metrics.name = "SUCRA")
-PlotBar(data = dataRankinma)
-> ```
->
-
-
-Example 2 for illustrating line chart when users have data for network meta-analysis of a single outcome but do not get treatment ranking metrics yet.
+Example 1 for illustrating line chart when users have data for network meta-analysis of a single outcome but do not get treatment ranking metrics yet.
 
 > **STEP 1.** Load data
 > ```{r, eval = FALSE}
@@ -241,7 +190,7 @@ PlotBar(data = dataRankinma,
 >
 
 
-Example 3 for illustrating beading plot when users have data for network meta-analysis of multiple outcomes but do not get treatment ranking metrics yet.
+Example 2 for illustrating beading plot when users have data for network meta-analysis of multiple outcomes but do not get treatment ranking metrics yet.
 
 > **STEP 1.** Load data
 > ```{r, eval = FALSE}

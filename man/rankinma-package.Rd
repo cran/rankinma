@@ -3,7 +3,7 @@
 \docType{package}
 \name{rankinma-package}
 \alias{rankinma-package}
-\title{rankinma: Ranking in Network Meta-Analysis}
+\title{rankinma: Rank in Network Meta-Analysis}
 \description{
 \emph{rankinma} is an R package that supports users to easily obtain and
 visualize various metrics of treatment ranking from network meta-analysis
