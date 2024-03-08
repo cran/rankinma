@@ -9,6 +9,7 @@ PlotBeads(
   scaleX = "Rank",
   txtValue = "Effects",
   color = NULL,
+  lgcBlind = FALSE,
   szPnt = NULL,
   szFntTtl = NULL,
   szFntTtlX = NULL,
@@ -27,6 +28,9 @@ PlotBeads(
 \item{txtValue}{STRING for indicating labels of metrics or effects on each point.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis.}
+
+\item{lgcBlind}{LOGIC value for indicating whether to display with color-blind
+friendly.}
 
 \item{szPnt}{NUMERIC value for indicating point size of ranking metrics.}
 

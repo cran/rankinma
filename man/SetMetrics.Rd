@@ -24,8 +24,9 @@ SetMetrics(
 be "NULL" when using "Probabilities" as metrics.}
 
 \item{metrics.name}{STRING for metrics of treatment ranking in terms of
-"SUCRA" and "P-score" for the value of surface under the cumulative
-ranking curve or P-score.}
+"SUCRA","P-score", and "P-best" for the value of surface under the
+cumulative ranking curve, P-score, and probability of achieving the
+best treatment.}
 
 \item{trans}{NUMERIC for indicating transparency of colors of treatments.}
 }

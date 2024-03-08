@@ -10,8 +10,9 @@
 #' @param metrics VARIABLE with numeric data for global metrics, but it should
 #'        be "NULL" when using "Probabilities" as metrics.
 #' @param metrics.name STRING for metrics of treatment ranking in terms of
-#'        "SUCRA" and "P-score" for the value of surface under the cumulative
-#'        ranking curve or P-score.
+#'        "SUCRA","P-score", and "P-best" for the value of surface under the
+#'        cumulative ranking curve, P-score, and probability of achieving the
+#'        best treatment.
 #' @param trans NUMERIC for indicating transparency of colors of treatments.
 #'
 #' @return

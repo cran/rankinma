@@ -130,6 +130,8 @@ PlotSpie <- function(data,
     }
   }
 
+  dataSpie <- dataSpie[order(dataSpie$outcomes, dataSpie$txs), ]
+
   setPar <- par(no.readonly = TRUE)
   on.exit(par(setPar))
 
@@ -153,8 +155,8 @@ PlotSpie <- function(data,
       }
 
       pie(table(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "outcome"]) / sum(table(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "outcome"])),
-          labels = if(rank(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"])[rank.i] == max(rank(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"]))){
-            paste(sprintf('%.2f',round(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"],2)), sep = "")
+          labels = if (rank(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"])[rank.i] == max(rank(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"]))) {
+            paste(sprintf('%.2f', round(dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"], 2)), sep = "")
           } else {""},
           radius = dataSpiePlot[dataSpiePlot$tx == TX.Spie, "metrics"][rank.i],
           border = c(rgb(0.3, 1, 1, 0)),

@@ -9,6 +9,8 @@
 #' @param scaleX    STRING for indicating scale on the x axis.
 #' @param txtValue  STRING for indicating labels of metrics or effects on each point.
 #' @param color     LIST of colors for treatments in a network meta-analysis.
+#' @param lgcBlind  LOGIC value for indicating whether to display with color-blind
+#'                  friendly.
 #' @param szPnt     NUMERIC value for indicating point size of ranking metrics.
 #' @param szFntTtl  NUMERIC value for indicating font size of main title.
 #' @param szFntTtlX NUMERIC value for indicating font size of title on X-axis.
@@ -59,6 +61,7 @@ PlotBeads <- function(data,
                       scaleX    = "Rank",
                       txtValue  = "Effects",
                       color     = NULL,
+                      lgcBlind  = FALSE,
                       szPnt     = NULL,
                       szFntTtl  = NULL,
                       szFntTtlX = NULL,
@@ -122,6 +125,9 @@ PlotBeads <- function(data,
   lgcColor  <- ifelse(length(which(ls()%in%ls(pattern = "color"))) > 0, FALSE,
                       ifelse(length(color) != data$n.tx,
                              TRUE, FALSE))
+
+  lgcLgcBlind <- ifelse(is.logical(lgcBlind),
+                        FALSE, TRUE)
 
   lgcSzPnt  <- ifelse(is.null(szPnt),
                       FALSE,
@@ -246,6 +252,13 @@ PlotBeads <- function(data,
     infoLgcColor <- paste(" Color: OK")
   }
 
+  if (lgcLgcBlind) {
+    infoLgcLgcBlind <- paste(" lgcBlind: ERROR\n",
+                          ' REQUIRE: Argument "lgcBlind" must be TRUE or FALSE.')
+  } else {
+    infoLgcLgcBlind <- paste(" lgcBlind: OK")
+  }
+
   if (lgcSzPnt) {
     infoStopSzPnt <- 'Argument "szPnt" must be a numeric value between 0 and 5 for indicating point size of ranking metrics.'
   } else {
@@ -303,6 +316,7 @@ PlotBeads <- function(data,
                     infoLgcScaleX,     "\n",
                     infoLgcTxtVal,     "\n",
                     infoLgcColor,      "\n",
+                    infoLgcLgcBlind,   "\n",
                     infoStopSzPnt,     "\n",
                     infoStopSzFntTtl,  "\n",
                     infoStopSzFntTtlX, "\n",
@@ -313,7 +327,7 @@ PlotBeads <- function(data,
                     infoLgcRotateTxt,  "\n",
                     sep = "")
 
-  if (lgcInher | lgcMtrcs | lgcScaleX | lgcTxtVal | lgcColor)
+  if (lgcInher | lgcMtrcs | lgcScaleX | lgcTxtVal | lgcColor | lgcLgcBlind)
     stop(infoStop)
 
 
@@ -354,13 +368,75 @@ PlotBeads <- function(data,
 
   if (!is.null(color)) {
     if (length(which(ls() %in% ls(pattern = "color"))) > 0) {
-      colorTx$colorTx <- rgb(col2rgb(color)[1, ]/255,
-                             col2rgb(color)[2, ]/255,
-                             col2rgb(color)[3, ]/255,
-                             data$trans)
+      colorTx$colorTx  <- rgb(col2rgb(color)[1, ] / 255,
+                              col2rgb(color)[2, ] / 255,
+                              col2rgb(color)[3, ] / 255,
+                              data$trans)
+      colorTx$clrTxOrg <- colorTx$colorTx
       for (color.i in c(1:nrow(dataBeadsPlot))) {
         dataBeadsPlot[color.i, "colorTx"] <- colorTx[which(dataBeadsPlot[color.i, "tx"] == colorTx$lsTx), "colorTx"]
       }
+    }
+  }
+
+  if (lgcBlind) {
+    typPntBeads <- rep(c(21:25), 9)
+    typPntTx    <- data$color.txs[, c("lsTx", "seqTx")]
+    typPntTx$typPntBeads <- typPntBeads[1:nrow(typPntTx)]
+
+    clrBlind    <- c(rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[1])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[1])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[1])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[2])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[2])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[2])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[3])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[3])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[3])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[4])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[4])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[4])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[5])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[5])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[5])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[6])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[6])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[6])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[7])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[7])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[7])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[8])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[8])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[8])[3, ] / 255,
+                             data$trans),
+                         5),
+                     rep(rgb(col2rgb(palette.colors(palette = "Okabe-Ito")[9])[1, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[9])[2, ] / 255,
+                             col2rgb(palette.colors(palette = "Okabe-Ito")[9])[3, ] / 255,
+                             data$trans),
+                         5)
+                     )
+
+    colorTx$clrBlindTx  <- clrBlind[1:nrow(colorTx)]
+    #colorTx$typPntBeads <- typPntBeads[1:nrow(colorTx)]
+
+    for (blind.i in c(1:nrow(dataBeadsPlot))) {
+      dataBeadsPlot[blind.i, "shape"]   <- typPntTx[which(dataBeadsPlot[blind.i, "tx"] == typPntTx$lsTx), "typPntBeads"]
+      dataBeadsPlot[blind.i, "colorTx"] <- colorTx[which(dataBeadsPlot[blind.i, "tx"] == colorTx$lsTx), "clrBlindTx"]
     }
   }
 
@@ -441,7 +517,7 @@ PlotBeads <- function(data,
        #xlim = c(-0.3, 1.3),
        xlim = c(infoExcessSpaceLeft, 1.3),
        ylim = c(0, ceiling(max(dataBeadsPlot$importance, na.rm = TRUE))),
-       xlab = "", xaxt = "n", yaxt = "n",ylab="",
+       xlab = "", ylab = "", xaxt = "n", yaxt = "n",
        pch = 0,
        cex = 0)
 
@@ -532,13 +608,14 @@ PlotBeads <- function(data,
 
   dataLgnd <- dataBeadsPlot[order(dataBeadsPlot$tx), ]
   vctTx    <- unique(dataLgnd$tx)
+  vctShape <- unique(dataLgnd$shape)
   vctColor <- unique(dataLgnd$colorTx)
 
   points(c(rep(1.1, data$n.tx)),
          (data$n.outcome - 0.5) / data$n.tx * c(data$n.tx:1),
-         pch = dataBeadsPlot$shape,
+         pch = vctShape,
          col = vctColor,
-         bg = vctColor,
+         bg  = vctColor,
          cex = infoSzPnt)
 
   text(c(rep(1.15, data$n.tx)),

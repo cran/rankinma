@@ -1,8 +1,31 @@
 # Change of package `rankinma`
 
 
+## rankinma 0.2.1
+### Date: March 08, 2024
+
+**Modify function:** fix bug in function `PlotSpie()`.
+\
+
+**Modify document:** improve *rankinma* package manual by detailing argument `P-best` for parameter `metrics` in both `GetMetrics()` and `SetMetrics()` functions.
+\
+
+**Modify document:** improve *rankinma* package README file and Vignette.
+\
+
+**Update to CRAN**  
+\
+
+
+### Date: February 17, 2024
+
+**Modify function:** improve function `PlotBeads()` by introducing a new parameter, `lgcBlind`, which enables users to generate the beading plot in a colorblind-friendly manner.
+\
+
+
+
 ## rankinma 0.2.0
-### Date: July 03, 2023
+### Date: January 29, 2024
 
 **Update to CRAN**  
 \

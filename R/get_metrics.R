@@ -11,9 +11,9 @@
 #' @param outcome STRING for name of outcome.
 #' @param prefer STRING for indicating which direction is beneficial treatment
 #'        effect in terms of "small" and "large" values in statistic test.
-#' @param metrics STRING for metrics of treatment ranking in terms of "SUCRA"
-#'        and "P-score" for the value of surface under the cumulative ranking
-#'        curve or P-score.
+#' @param metrics STRING for metrics of treatment ranking in terms of "SUCRA",
+#'         "P-score", and "P-best" for the value of surface under the cumulative
+#'        ranking curve, P-score, and probability of achieving the best treatment.
 #' @param model STRING for analysis model in terms of "random" and "common" for
 #'        random-effects model and common-effect model.
 #' @param simt INTEGER for times of simulations to estimate surface under the

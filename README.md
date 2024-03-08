@@ -5,9 +5,9 @@
 <img src = "https://github.com/EnochKang/rankinma/blob/main/vignettes/rankinma_logo.png?raw=true" align = "left" width = "120" />
 <br>
 
-# &nbsp; **rankinma** 
+# &nbsp; **rankinma**
 
-#### &nbsp; &nbsp; *Rank in Network Meta-Analysis*
+#### &nbsp; &nbsp; <span style="color:blue"> *Rank i*</span>*n* <span style="color:blue">*N*</span>*etwork *<span style="color:blue">*M*</span>*eta-*<span style="color:blue">*A*</span>*nalysis*
 
 [Chiefeng Chen](https://orcid.org/0000-0002-1595-6553), [Enoch
 Kang](https://orcid.org/0000-0002-4903-942X), [Wen-Hsuan
@@ -22,7 +22,7 @@ Chan](https://www.duke-nus.edu.sg/core/about/people-leadership/core-visiting-exp
 <!-- badges: start -->
 
 &nbsp; [![CRAN](https://img.shields.io/cran/v/rankinma?color=blue&label=CRAN&logo=r&logoColor=skyblue)](https://cran.r-project.org/package=rankinma)
-&nbsp; [![Update date](https://img.shields.io/badge/Update%20date-2023.09.01-blue.svg?logo=r&logoColor=skyblue)](https://github.com/EnochKang/rankinma/blob/main/NEWS.md)
+&nbsp; [![Update date](https://img.shields.io/badge/Update%20date-2024.Mar.08-blue.svg?logo=r&logoColor=skyblue)](https://github.com/EnochKang/rankinma/blob/main/NEWS.md)
 &nbsp; [![Shiny](https://img.shields.io/badge/Shiny-shinyapps.io-blue?style=flat&labelColor=gray25&logo=RStudio&logoColor=skyblue)](https://rankinma.shinyapps.io/rankinma/)
 &nbsp; [![Licence](https://img.shields.io/badge/licence-GPL--3-brightgreen.svg?color=blue&label=Licence&logo=gnu&logoColor=skyblue)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
@@ -30,7 +30,7 @@ Chan](https://www.duke-nus.edu.sg/core/about/people-leadership/core-visiting-exp
 &nbsp; [![Functions](https://img.shields.io/badge/Functions-7-green.svg?logo=r&logoColor=green)](https://cran.r-project.org/package=rankinma)
 &nbsp; [![Dependencis](https://tinyverse.netlify.com/badge/rankinma)](https://cran.r-project.org/package=rankinma)
 &nbsp; [![Monthly Downloads](https://cranlogs.r-pkg.org:443/badges/rankinma?color=orange)](https://cranlogs.r-pkg.org:443/badges/rankinma)
-&nbsp; [![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/aides?color=orange)](https://cran.r-project.org/package=rankinma)
+&nbsp; [![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/rankinma?color=orange)](https://cran.r-project.org/package=rankinma)
 
 <!-- badges: end -->
 <!-- content: start -->
