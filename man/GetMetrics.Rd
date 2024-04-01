@@ -10,7 +10,8 @@ GetMetrics(
   prefer = NULL,
   metrics = NULL,
   model = "random",
-  simt = 1000
+  simt = 1000,
+  rob = NULL
 )
 }
 \arguments{
@@ -22,14 +23,17 @@ GetMetrics(
 effect in terms of "small" and "large" values in statistic test.}
 
 \item{metrics}{STRING for metrics of treatment ranking in terms of "SUCRA",
-"P-score", and "P-best" for the value of surface under the cumulative
-ranking curve, P-score, and probability of achieving the best treatment.}
+"P-score", and "P-best" for the value of surface under the
+cumulative ranking curve, P-score, and probability of achieving
+the best treatment.}
 
 \item{model}{STRING for analysis model in terms of "random" and "common" for
 random-effects model and common-effect model.}
 
 \item{simt}{INTEGER for times of simulations to estimate surface under the
 cumulative ranking curve (SUCRA).}
+
+\item{rob}{STRING for column name of risk of bias.}
 }
 \value{
 \strong{GetMetrics()} returns a data.frame with three columns, including

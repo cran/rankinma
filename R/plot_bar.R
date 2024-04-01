@@ -357,6 +357,8 @@ PlotBar <- function(data,
 
     ## 07.2 PLOT bar chart for global metrics -----
 
+    par(mar = c(5, 5, 5, 5), xpd = TRUE)
+
     for (outcome.i in c(1:length(outcomes))) {
 
       dataBarPlot             <- dataBar[dataBar$outcomes == outcome.i, ]

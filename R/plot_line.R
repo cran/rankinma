@@ -703,7 +703,7 @@ PlotLine <- function(data,
     } else {
       # 7.2.2. Separated line charts (global metrics) -----
 
-      par(mar = c(5, 5, 5, 7), xpd = TRUE)
+      par(mar = c(5, 5, 5, 5), xpd = TRUE)
 
       for (outcome.i in c(1:length(outcomes))) {
         dataLinePlot <- dataLine[dataLine$outcomes == outcome.i, ]
@@ -716,7 +716,7 @@ PlotLine <- function(data,
              type = "line",
              cex.names = 0.8,
              cex.axis = 0.8,
-             xlim = c(1, max(dataLinePlot$seq.tx)),
+             xlim = c(0.5, max(dataLinePlot$seq.tx)),
              ylim = c(-0.2, 1.2),
              xaxt = "n", xlab = "Treatment",
              yaxt = "n", ylab = data$metrics.name,

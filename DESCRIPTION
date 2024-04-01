@@ -1,8 +1,8 @@
 Package: rankinma
 Type: Package
 Title: Rank in Network Meta-Analysis
-Version: 0.2.1
-Date: 2024-03-08
+Version: 0.2.2
+Date: 2024-04-01
 Authors@R: c(person("Chiehfeng", "Chen", role = c("aut"), 
                   comment = c(ORCID = "0000-0002-1595-6553"), 
                   email = "clifchen@tmu.edu.tw"),
@@ -31,7 +31,7 @@ RoxygenNote: 7.2.2
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-03-08 21:46:25 UTC; KYN
+Packaged: 2024-04-01 13:39:09 UTC; KYN
 Author: Chiehfeng Chen [aut] (<https://orcid.org/0000-0002-1595-6553>),
   Enoch Kang [aut, cre, trl] (<https://orcid.org/0000-0002-4903-942X>),
   Wen-Hsuan Hou [aut] (<https://orcid.org/0000-0002-4376-6298>),
@@ -39,4 +39,4 @@ Author: Chiehfeng Chen [aut] (<https://orcid.org/0000-0002-1595-6553>),
   Yu-Chieh Chuang [aut] (<https://orcid.org/0000-0002-7124-6556>),
   Edwin Chan [aut]
 Repository: CRAN
-Date/Publication: 2024-03-08 22:00:02 UTC
+Date/Publication: 2024-04-01 13:50:02 UTC

@@ -6,9 +6,10 @@
 \usage{
 PlotBeads(
   data,
-  scaleX = "Rank",
+  scaleX = "Numeric",
   txtValue = "Effects",
   color = NULL,
+  whichRoB = "None",
   lgcBlind = FALSE,
   szPnt = NULL,
   szFntTtl = NULL,
@@ -28,6 +29,9 @@ PlotBeads(
 \item{txtValue}{STRING for indicating labels of metrics or effects on each point.}
 
 \item{color}{LIST of colors for treatments in a network meta-analysis.}
+
+\item{whichRoB}{STRING for indicating how to display risk of bias for each
+treatment.}
 
 \item{lgcBlind}{LOGIC value for indicating whether to display with color-blind
 friendly.}

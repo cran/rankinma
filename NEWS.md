@@ -1,6 +1,34 @@
 # Change of package `rankinma`
 
 
+## rankinma 0.2.2
+### Date: April 01, 2024
+
+**Modify document:** improve *rankinma* package manual by adding parameter `rob` in function `GetMetrics()`.
+\
+
+**Modify document:** improve *rankinma* package manual by adding parameter `whichRoB` in function `GetMetrics()`.
+\
+
+**Modify document:** improve *rankinma* package Vignette to show beading plot with equidistant by ranks and non-equidistant by global metrics.
+\
+
+**Update to CRAN**  
+\
+
+
+### Date: March 23, 2024
+
+**Modify function:** improve function `GetMetrics()` by introducing a new parameter, `rob`, which enables users to designate a vector of risk of bias for each study.
+\
+
+**Modify function:** improve function `SetMetrics()` in order to set risk of bias for further uses in graphics.
+\
+
+**Modify function:** improve function `PlotBeads()` by introducing a new parameter, `whichRoB`, which enables users to show risk of bias for each treatment on beading plot. Besides, this modification is also to change the x-axis title of equidistant beading plot by ranks.
+\
+
+
 ## rankinma 0.2.1
 ### Date: March 08, 2024
 

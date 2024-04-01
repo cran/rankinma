@@ -1,7 +1,7 @@
 ---
 title: "An overview on rankinma"
 author: "Enoch Kang, Chiehfeng Chen Wen-Hsuan Hou, Jin-Hua Chen, Yu-Chieh Chuang, & Edwin Chan"
-date: "March 08, 2024"
+date: "April 01, 2024"
 description: > 
   Rank in network meta-analysis.
 output: 
@@ -29,7 +29,7 @@ knitr::include_graphics("rankinma_logo.png")
 ```
 
 [![CRAN](https://img.shields.io/badge/CRAN-v0.2.1-blue.svg?logo=r&logoColor=skyblue)](https://CRAN.R-project.org/package=rankinma)
-[![Update date](https://img.shields.io/badge/Update%20date-2024.Mar.08-blue.svg?logo=r&logoColor=skyblue)](https://github.com/EnochKang/rankinma/blob/main/NEWS.md)
+[![Update date](https://img.shields.io/badge/Update%20date-2024.Apr.01-blue.svg?logo=r&logoColor=skyblue)](https://github.com/EnochKang/rankinma/blob/main/NEWS.md)
 
 
 ## Brief overview
@@ -334,7 +334,7 @@ dataRankinma <- (dataMetrics,
 
 **STEP 5.** Visualize global ranking metrics
 
-*Illustrate beading plot based on SUCRA*
+*Illustrate beading plot based on SUCRA (without relative effect)*
 ```{r, eval = FALSE}
 PlotBeads(data = dataRankinma)
 ```
@@ -371,13 +371,14 @@ PlotBeads(data = dataRankinma)
 
 \
 
-*Colorblind-friendly Beading plot based on P-best*
+*Illustrate beading plot sorted by P-score (with relative effects and equidistant by rank)*
 ```{r, eval = FALSE}
-PlotBeads(data = dataRankinma,
-          lgcBlind = TRUE)
+PlotBeads(data = dataRankinma, 
+          scaleX = "Rank",
+          txtValue = "Effects")
 ```
 
-```{r, eval = TRUE, echo = FALSE, message = FALSE, results = "hide", fig.cap = "**Figure 3C**. Colorblind friendly beading plot for P-score on two outcomes", fig.height = 6, fig.width = 8, fig.align = "center", out.width = "90%"}
+```{r, eval = TRUE, echo = FALSE, message = FALSE, results = "hide", fig.cap = "**Figure 3A**. Beading plot for SUCRA on two outcomes", fig.height = 6, fig.width = 8, fig.align = "center", out.width = "90%"}
 data(Senn2013)
 nmaOutput <- netmeta(TE, 
                      seTE, 
@@ -404,6 +405,46 @@ dataRankinma <- SetMetrics(dataMetrics,
                            outcome = outcome, 
                            metrics = P.score, 
                            metrics.name = "P-score")
+PlotBeads(data = dataRankinma, 
+          scaleX = "Rank",
+          txtValue = "Effects")
+```
+
+\
+
+*Illustrate colorblind-friendly beading plot based on P-best*
+```{r, eval = FALSE}
+PlotBeads(data = dataRankinma,
+          lgcBlind = TRUE)
+```
+
+```{r, eval = TRUE, echo = FALSE, message = FALSE, results = "hide", fig.cap = "**Figure 3C**. Colorblind friendly beading plot for P-score on two outcomes", fig.height = 6, fig.width = 8, fig.align = "center", out.width = "90%"}
+data(Senn2013)
+nmaOutput <- netmeta(TE, 
+                     seTE, 
+                     treat1, 
+                     treat2, 
+                     studlab, 
+                     data = Senn2013, 
+                     sm = "SMD")
+nmaRandom <- GetMetrics(nmaOutput, 
+                        outcome = "HbA1c.random", 
+                        prefer = "small", 
+                        metrics = "P-best", 
+                        model = "random", 
+                        simt = 1000)
+nmaCommon <- GetMetrics(nmaOutput, 
+                        outcome = "HbA1c.common", 
+                        prefer = "small", 
+                        metrics = "P-best", 
+                        model = "common", 
+                        simt = 1000)
+dataMetrics <- rbind(nmaRandom, nmaCommon)
+dataRankinma <- SetMetrics(dataMetrics, 
+                           tx = tx, 
+                           outcome = outcome, 
+                           metrics = P.best, 
+                           metrics.name = "P-best")
 PlotBeads(data = dataRankinma,
           lgcBlind = TRUE)
 ```

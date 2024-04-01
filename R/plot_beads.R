@@ -9,6 +9,8 @@
 #' @param scaleX    STRING for indicating scale on the x axis.
 #' @param txtValue  STRING for indicating labels of metrics or effects on each point.
 #' @param color     LIST of colors for treatments in a network meta-analysis.
+#' @param whichRoB  STRING for indicating how to display risk of bias for each
+#'                  treatment.
 #' @param lgcBlind  LOGIC value for indicating whether to display with color-blind
 #'                  friendly.
 #' @param szPnt     NUMERIC value for indicating point size of ranking metrics.
@@ -58,9 +60,10 @@
 #' @export PlotBeads
 
 PlotBeads <- function(data,
-                      scaleX    = "Rank",
+                      scaleX    = "Numeric",
                       txtValue  = "Effects",
                       color     = NULL,
+                      whichRoB  = "None",
                       lgcBlind  = FALSE,
                       szPnt     = NULL,
                       szFntTtl  = NULL,
@@ -105,6 +108,7 @@ PlotBeads <- function(data,
   outcomes  <- unique(dataBeads$outcome)
   lsScaleX  <- c("Rank", "Numeric")
   lsTxtVal  <- c("Effects", "Metrics", "None")
+  lsRoB     <- c("None", "Average", "Majority", "Worst")
 
 
 
@@ -126,8 +130,13 @@ PlotBeads <- function(data,
                       ifelse(length(color) != data$n.tx,
                              TRUE, FALSE))
 
+  lgcWhichRoB <- ifelse(whichRoB %in% lsRoB,
+                        FALSE,
+                        TRUE)
+
   lgcLgcBlind <- ifelse(is.logical(lgcBlind),
-                        FALSE, TRUE)
+                        FALSE,
+                        TRUE)
 
   lgcSzPnt  <- ifelse(is.null(szPnt),
                       FALSE,
@@ -252,6 +261,13 @@ PlotBeads <- function(data,
     infoLgcColor <- paste(" Color: OK")
   }
 
+  if (lgcWhichRoB) {
+    infoLgcWhichRoB <- paste(" Risk of bias: ERROR\n",
+                            ' REQUIRE: Argument "whichRoB" should be "None", "Average", "Majority", or "Worst"')
+  } else {
+    infoLgcWhichRoB  <- paste(" Risk of bias: OK")
+  }
+
   if (lgcLgcBlind) {
     infoLgcLgcBlind <- paste(" lgcBlind: ERROR\n",
                           ' REQUIRE: Argument "lgcBlind" must be TRUE or FALSE.')
@@ -316,6 +332,7 @@ PlotBeads <- function(data,
                     infoLgcScaleX,     "\n",
                     infoLgcTxtVal,     "\n",
                     infoLgcColor,      "\n",
+                    infoLgcWhichRoB,   "\n",
                     infoLgcLgcBlind,   "\n",
                     infoStopSzPnt,     "\n",
                     infoStopSzFntTtl,  "\n",
@@ -327,7 +344,7 @@ PlotBeads <- function(data,
                     infoLgcRotateTxt,  "\n",
                     sep = "")
 
-  if (lgcInher | lgcMtrcs | lgcScaleX | lgcTxtVal | lgcColor | lgcLgcBlind)
+  if (lgcInher | lgcMtrcs | lgcScaleX | lgcTxtVal | lgcColor | lgcWhichRoB | lgcLgcBlind)
     stop(infoStop)
 
 
@@ -337,20 +354,21 @@ PlotBeads <- function(data,
   infoScaleX <- scaleX
   infoTxtVal <- txtValue
 
-  if (infoTxtVal == "Effects") {
-    dataBeads$txtVal <- paste(dataBeads$SM, ": ",
-                              round(dataBeads$ES, 2),
-                              sep = "")
-  } else if (infoTxtVal == "Metrics") {
-    dataBeads$txtVal <- paste(data$metrics.name, ": ",
-                              round(dataBeads$metrics, 2),
-                              sep = "")
-  } else {
-    dataBeads$txtVal <- NA
-  }
+    if (infoTxtVal == "Effects") {
+      dataBeads$txtVal <- paste(dataBeads$measure, ": ",
+                                round(dataBeads$effect, 2),
+                                sep = "")
+    } else if (infoTxtVal == "Metrics") {
+      dataBeads$txtVal <- paste(data$metrics.name, ": ",
+                                round(dataBeads$metrics, 2),
+                                sep = "")
+    } else {
+      dataBeads$txtVal <- NA
+    }
+
 
   dataBeads$importance  <- dataBeads$outcomes
-  dataBeads$shape       <- 16
+  dataBeads$shape       <- 21
 
   dataBeads$seq.outcome <- max(dataBeads$outcomes) + 1 - dataBeads$outcomes
   dataBeads$seq.tx      <- max(dataBeads$txs) + 1 - dataBeads$txs
@@ -378,6 +396,7 @@ PlotBeads <- function(data,
       }
     }
   }
+
 
   if (lgcBlind) {
     typPntBeads <- rep(c(21:25), 9)
@@ -434,11 +453,44 @@ PlotBeads <- function(data,
     colorTx$clrBlindTx  <- clrBlind[1:nrow(colorTx)]
     #colorTx$typPntBeads <- typPntBeads[1:nrow(colorTx)]
 
-    for (blind.i in c(1:nrow(dataBeadsPlot))) {
-      dataBeadsPlot[blind.i, "shape"]   <- typPntTx[which(dataBeadsPlot[blind.i, "tx"] == typPntTx$lsTx), "typPntBeads"]
-      dataBeadsPlot[blind.i, "colorTx"] <- colorTx[which(dataBeadsPlot[blind.i, "tx"] == colorTx$lsTx), "clrBlindTx"]
+    for (i.blind in c(1:nrow(dataBeadsPlot))) {
+      dataBeadsPlot[i.blind, "shape"]   <- typPntTx[which(dataBeadsPlot[i.blind, "tx"] == typPntTx$lsTx), "typPntBeads"]
+      dataBeadsPlot[i.blind, "colorTx"] <- colorTx[which(dataBeadsPlot[i.blind, "tx"] == colorTx$lsTx), "clrBlindTx"]
     }
   }
+
+
+  if (whichRoB == "Average") {
+    dataBeadsPlot$colorRoB <- ifelse(is.na(dataBeadsPlot$robMean),
+                                     "black",
+                                     ifelse(round(dataBeadsPlot$robMean, 0) == 1,
+                                            "green",
+                                            ifelse(round(dataBeadsPlot$robMean, 0) == 2,
+                                                   "gold",
+                                                   "red"))
+    )
+  } else if (whichRoB == "Majority") {
+    dataBeadsPlot$colorRoB <- ifelse(is.na(dataBeadsPlot$robMajor),
+                                     "black",
+                                     ifelse(round(dataBeadsPlot$robMajor, 0) == 1,
+                                            "green",
+                                            ifelse(round(dataBeadsPlot$robMajor, 0) == 2,
+                                                   "gold",
+                                                   "red"))
+    )
+  } else if  (whichRoB == "Worst") {
+    dataBeadsPlot$colorRoB <- ifelse(is.na(dataBeadsPlot$robWorst),
+                                     "black",
+                                     ifelse(round(dataBeadsPlot$robWorst, 0) == 1,
+                                            "green",
+                                            ifelse(round(dataBeadsPlot$robWorst, 0) == 2,
+                                                   "gold",
+                                                   "red"))
+    )
+  } else {
+    dataBeadsPlot$colorRoB <- dataBeadsPlot$colorTx
+  }
+
 
   if (is.null(szPnt)) {
     infoSzPnt           <- 2
@@ -513,16 +565,16 @@ PlotBeads <- function(data,
   ## 07.1 Main part -----
 
   plot(dataBeadsPlot$metrics,
-       dataBeadsPlot$seq.axis.y - 0.5, frame.plot = FALSE,
+       dataBeadsPlot$seq.axis.y, frame.plot = FALSE,
        #xlim = c(-0.3, 1.3),
        xlim = c(infoExcessSpaceLeft, 1.3),
-       ylim = c(0, ceiling(max(dataBeadsPlot$importance, na.rm = TRUE))),
+       ylim = c(0, ceiling(max(dataBeadsPlot$importance, na.rm = TRUE)) + 0.5),
        xlab = "", ylab = "", xaxt = "n", yaxt = "n",
        pch = 0,
        cex = 0)
 
   axis(side = 3, at = c(0.5),
-       line = -2,
+       line = -1,
        tick = FALSE,
        labels = paste("Beading plot of ", data$metrics.name,
                       sep = ""),
@@ -548,7 +600,7 @@ PlotBeads <- function(data,
          cex.axis = infoSzFntX)
 
     axis(side = 1, at = c(0.5), line = 2, tick = FALSE,
-         labels = paste("Rank order based on ",
+         labels = paste("Rank according to ",
                         data$metrics.name,
                         sep = ""),
          font = 1,
@@ -557,9 +609,11 @@ PlotBeads <- function(data,
     points(dataBeadsPlot$place,
            dataBeadsPlot$seq.axis.y - 0.5,
            pch = dataBeadsPlot$shape,
-           col = c(dataBeadsPlot$colorTx),
+           col = c(dataBeadsPlot$colorRoB),
            bg = c(dataBeadsPlot$colorTx),
-           cex = infoSzPnt)
+           cex = infoSzPnt,
+           lwd = 1 + infoSzPnt / 2,
+           lty = 3)
   } else {
     axis(side = 1, at = c(0, 0.2, 0.4, 0.6, 0.8, 1),
          cex.axis = infoSzFntX)
@@ -575,30 +629,38 @@ PlotBeads <- function(data,
     points(dataBeadsPlot$metrics,
            dataBeadsPlot$seq.axis.y - 0.5,
            pch = dataBeadsPlot$shape,
-           col = c(dataBeadsPlot$colorTx),
+           col = c(dataBeadsPlot$colorRoB),
            bg = c(dataBeadsPlot$colorTx),
-           cex = infoSzPnt)
+           cex = infoSzPnt,
+           lwd = 1 + infoSzPnt / 2,
+           lty = 3)
   }
 
 
   ## 07.2 Text values on each point -----
 
-  if (infoScaleX == "Rank") {
-    text(dataBeadsPlot$place,
-         dataBeadsPlot$seq.axis.y - 0.6,
-         dataBeadsPlot$txtVal,
-         col = "gray25",
-         cex = infoSzFntTxt,
-         pos = 2,
-         srt = infoRotateTxt)
-  } else {
-    text(dataBeadsPlot$metrics,
-         dataBeadsPlot$seq.axis.y - 0.6,
-         dataBeadsPlot$txtVal,
-         col = "gray25",
-         cex = infoSzFntTxt,
-         pos = 2,
-         srt = infoRotateTxt)
+  if (is.null(substitute(txtValue)) | !(txtValue %in% c("Effects", "Metrics"))) {
+    txtValue <- "NULL"
+  }
+
+  if (txtValue != "NULL") {
+    if (infoScaleX == "Rank") {
+      text(dataBeadsPlot$place,
+           dataBeadsPlot$seq.axis.y - 0.6,
+           dataBeadsPlot$txtVal,
+           col = "gray25",
+           cex = infoSzFntTxt,
+           pos = 2,
+           srt = infoRotateTxt)
+    } else {
+      text(dataBeadsPlot$metrics,
+           dataBeadsPlot$seq.axis.y - 0.6,
+           dataBeadsPlot$txtVal,
+           col = "gray25",
+           cex = infoSzFntTxt,
+           pos = 2,
+           srt = infoRotateTxt)
+    }
   }
 
 
@@ -606,10 +668,22 @@ PlotBeads <- function(data,
 
   ## 07.3 Legend -----
 
-  dataLgnd <- dataBeadsPlot[order(dataBeadsPlot$tx), ]
-  vctTx    <- unique(dataLgnd$tx)
-  vctShape <- unique(dataLgnd$shape)
-  vctColor <- unique(dataLgnd$colorTx)
+  dataLgnd    <- dataBeadsPlot[order(dataBeadsPlot$tx), ]
+  #vctTx    <- unique(dataLgnd$tx)
+  #vctShape <- unique(dataLgnd$shape)
+  #vctColor <- unique(dataLgnd$colorTx)
+  dataLgndPnt <- unique(dataLgnd[, c("tx", "shape", "colorTx")])
+
+  vctTx    <- as.vector(dataLgndPnt$tx)
+  vctShape <- as.vector(dataLgndPnt$shape)
+  vctColor <- as.vector(dataLgndPnt$colorTx)
+
+  text(c(1.05),
+       ceiling(max(dataBeadsPlot$importance, na.rm = TRUE)),
+       "Point color (treatment)",
+       cex = infoSzFntLgnd,
+       font = 2,
+       pos = 4)
 
   points(c(rep(1.1, data$n.tx)),
          (data$n.outcome - 0.5) / data$n.tx * c(data$n.tx:1),
@@ -623,5 +697,27 @@ PlotBeads <- function(data,
        vctTx,
        cex = infoSzFntLgnd,
        pos = 4)
+
+  if (whichRoB %in% c("Average", "Majority", "Worst")) {
+    text(c(1.05),
+         0.2,
+         "Border color (bias)",
+         cex = infoSzFntLgnd,
+         font = 2,
+         pos = 4)
+
+    points(c(rep(1.1, 3)),
+           c(-0.5, -0.25, 0),
+           pch = 21,
+           col = c("red", "gold", "green"),
+           bg  = c(rgb(1, 1, 1, 0), rgb(1, 1, 1, 0), rgb(1, 1, 1, 0)),
+           cex = infoSzPnt)
+
+    text(c(rep(1.15, 3)),
+         c(-0.5, -0.25, 0),
+         c("High risk", "Some concerns", "Low risk"),
+         cex = infoSzFntLgnd,
+         pos = 4)
+  }
 
 }

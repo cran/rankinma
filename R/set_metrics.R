@@ -57,11 +57,11 @@
 #' @export SetMetrics
 
 SetMetrics <- function(data,
-                       outcome = NULL,
-                       tx = NULL,
-                       metrics = NULL,
+                       outcome      = NULL,
+                       tx           = NULL,
+                       metrics      = NULL,
                        metrics.name = NULL,
-                       trans = 0.8) {
+                       trans        = 0.8) {
 
   data <- data.frame(data)
 
@@ -193,10 +193,10 @@ SetMetrics <- function(data,
   outcomes     <- unique(data$outcome)
   infoOutcomes <- length(outcomes)
 
-  if (metrics.name != "Probabilities") {
-    colnames(data)[length(data) - 1] <- "ES"
-    colnames(data)[length(data) - 2] <- "SM"
-  }
+  #if (metrics.name != "Probabilities") {
+  #  colnames(data)[length(data) - 1] <- "ES"
+  #  colnames(data)[length(data) - 2] <- "SM"
+  #}
 
   for (i in c(1:nrow(data))) {
     data[i, "txs"] <- which(as.character(txs) == as.character(data[i, "tx"]))
@@ -229,12 +229,29 @@ SetMetrics <- function(data,
   ## 03.2 SET metrics -----
 
   if (metrics.name == "Probabilities") {
+
+    if ("robMean" %in% colnames(data) & "robMajor" %in% colnames(data) & "robWorst" %in% colnames(data)) {
+      dataProbabilitiesRoB <- data[, c("robMean", "robMajor", "robWorst")]
+      data <- data[, -which(colnames(data) == "robMean" | colnames(data) == "robMajor" | colnames(data) == "robWorst")]
+    }
+
     dataSet <- as.data.frame(cbind(
       data[, c("outcome", "outcomes", "tx", "txs", "rank", "colorTx")],
       data[, c(3:(nrow(data) * 2 + 2))]))
+
   } else {
 
-    dataSet <- data[, c("outcome", "outcomes", "importance", "tx", "txs", "colorTx", "metrics", "SM", "ES")]
+    dataSet <- data[, c("outcome", "outcomes", "importance", "tx", "txs", "colorTx", "metrics", "measure", "effect")]
+
+    if ("robMean" %in% colnames(data) & "robMajor" %in% colnames(data) & "robWorst" %in% colnames(data)) {
+      dataSet$robMean  <- data$robMean
+      dataSet$robMajor <- data$robMajor
+      dataSet$robWorst <- data$robWorst
+    } else {
+      dataSet$robMean  <- NA
+      dataSet$robMajor <- NA
+      dataSet$robWorst <- NA
+    }
 
     for (outcome.i in c(1:max(dataSet$outcomes))) {
       dataTempA <- dataSet[dataSet$outcomes == outcome.i, ]
@@ -389,51 +406,50 @@ SetMetrics <- function(data,
 
   # 04 BUILD an object of *rankinma* class  -----
 
-  dataList        <- list(metrics.name = metrics.name,
-                          ls.outcome   = unique(data$outcome),
-                          ls.tx        = unique(data$tx),
-                          n.outcome    = length(unique(data$outcome)),
-                          n.tx         = length(unique(data$tx)))
-  class(dataList)       <- "rankinma"
-  dataList$data         <- dataSet
-  dataList$data.sets    <- split(dataSet, dataSet$outcome)
+  lsSet <- list(metrics.name = metrics.name,
+                ls.outcome   = unique(data$outcome),
+                ls.tx        = unique(data$tx),
+                n.outcome    = length(unique(data$outcome)),
+                n.tx         = length(unique(data$tx)))
+
+  class(lsSet)       <- "rankinma"
+  lsSet$data         <- dataSet
+  lsSet$data.sets    <- split(dataSet, dataSet$outcome)
   if (infoOutcomes > 1) {
     if (metrics.name != "Probabilities") {
-      dataList$ptrn.tx      <- tblTxOutcome
-      dataList$ptrn.outcome <- tblOutcomeTx
+      lsSet$ptrn.tx      <- tblTxOutcome
+      lsSet$ptrn.outcome <- tblOutcomeTx
     }
   }
-  dataList$color.txs    <- colorTx
-  dataList$trans        <- trans
-  dataRankinma          <- dataList
+  lsSet$color.txs    <- colorTx
+  lsSet$trans        <- trans
+  dataRankinma       <- lsSet
 
 
   # 05 REPORT returns of function `SetMetrics()` -----
 
   cat(paste("\n"), fill = TRUE, sep = "")
   cat(paste("Summary of metrics:\n",
-            "Metrics: ", dataList$metrics.name, "\n",
-            "Outcomes:   ", dataList$n.outcome, "\n",
-            "Treatments: ", dataList$n.tx, "\n"),
+            "Metrics: ", lsSet$metrics.name, "\n",
+            "Outcomes:   ", lsSet$n.outcome, "\n",
+            "Treatments: ", lsSet$n.tx, "\n"),
       fill = TRUE, sep = "")
 
   cat(paste("List of outcomes:"),
       fill = TRUE, sep = "")
-  cat(paste(" ", c(1:dataList$n.outcome), dataList$ls.outcome, sep = " "),
+  cat(paste(" ", c(1:lsSet$n.outcome), lsSet$ls.outcome, sep = " "),
       fill = TRUE, sep = "\n")
 
   cat(paste("List of treatments:"),
       fill = TRUE, sep = "")
-  cat(paste(" ", c(1:dataList$n.tx), dataList$ls.tx, sep = " "),
+  cat(paste(" ", c(1:lsSet$n.tx), lsSet$ls.tx, sep = " "),
       fill = TRUE, sep = "\n")
 
-  dataRankinma <- dataList
+  dataRankinma <- lsSet
 
 }
 
 #' @title Display color for each treatment
-#'
-#' @author Enoch Kang
 #'
 #' @description
 #' ShowColor is a function for showing colors of every treatment on plot of
@@ -455,7 +471,8 @@ ShowColor <- function(data) {
   plot(c(0, 1.5),
        c(0, 1),
        frame.plot = FALSE,
-       xlab = "", ylab="", xaxt = "n", yaxt = "n",
+       xlab = "", ylab = "",
+       xaxt = "n", yaxt = "n",
        col = "white")
   segments(rep(0.5, max(dataColor$seqTx)),
            (0.95) / max(dataColor$seqTx) * unique(dataColor$seqTx),
